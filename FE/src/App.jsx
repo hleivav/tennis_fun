@@ -81,7 +81,7 @@ function App() {
         )}
         
         {currentView === 'admin' && isAdmin && <AdminForm />}
-        {currentView === 'ongoing' && <OngoingTournament />}
+        {currentView === 'ongoing' && <OngoingTournament isAdmin={isAdmin} />}
         {currentView === 'archive' && <ArchivedTournaments onViewTournament={handleViewArchivedTournament} isAdmin={isAdmin} />}
         {currentView === 'archivedTournament' && selectedArchivedTournament && (
           <div>
@@ -102,7 +102,7 @@ function App() {
             >
               ← Tillbaka till arkiv
             </button>
-            <OngoingTournament tournamentData={selectedArchivedTournament} isReadOnly={true} />
+            <OngoingTournament tournamentData={selectedArchivedTournament} isReadOnly={true} isAdmin={isAdmin} />
           </div>
         )}
       </div>

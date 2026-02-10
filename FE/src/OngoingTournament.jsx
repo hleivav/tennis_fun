@@ -3,7 +3,7 @@ import { getAllTournaments, getTournamentById, reportMatch, updateMatch, getMatc
 import MatchReportModal from './MatchReportModal';
 import './OngoingTournament.css';
 
-export default function OngoingTournament({ tournamentData = null, isReadOnly = false }) {
+export default function OngoingTournament({ tournamentData = null, isReadOnly = false, isAdmin = false }) {
   const [tournament, setTournament] = useState(tournamentData);
   const [loading, setLoading] = useState(!tournamentData);
   const [error, setError] = useState(null);
@@ -461,6 +461,23 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     setPlayoffSetup(newSetup);
   };
 
+  // Funktion för att ta bort en spelare från en match
+  const handleRemovePlayerFromMatch = (groupId, playerName) => {
+    // Återställ matchuppställningen lokalt (utan att uppdatera backend)
+    // Backend uppdateras först när användaren väljer nya spelare
+    const updatedTournament = { ...tournament };
+    const group = updatedTournament.groups.find(g => g.id === parseInt(groupId));
+    if (group) {
+      group.participants = [];
+    }
+    setTournament(updatedTournament);
+    
+    // Återställ hela setupen för denna grupp
+    const newSetup = { ...playoffSetup };
+    newSetup[groupId] = { player1: null, player2: null, filled: false };
+    setPlayoffSetup(newSetup);
+  };
+
   const handleReportSubmit = async (reportData) => {
     const isEditMode = !!reportData.matchId;
     try {
@@ -738,7 +755,14 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                         return (
                           <div key={idx} className={`playoff-match-row ${result ? 'completed' : ''}`}>
                             <div className="player-side">
-                              <span className="player-name">{match.player1}</span>
+                              <span 
+                                className="player-name"
+                                onDoubleClick={() => !result && !isReadOnly && handleRemovePlayerFromMatch(group.id, match.player1)}
+                                style={!result && !isReadOnly ? { cursor: 'pointer' } : {}}
+                                title={!result && !isReadOnly ? 'Dubbelklicka för att ta bort från match' : ''}
+                              >
+                                {match.player1}
+                              </span>
                               {result && <span className="player-score">{result.score1 ?? '-'}</span>}
                             </div>
                             <div className="match-divider">
@@ -748,7 +772,14 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                             </div>
                             <div className="player-side">
                               {result && <span className="player-score">{result.score2 ?? '-'}</span>}
-                              <span className="player-name">{match.player2}</span>
+                              <span 
+                                className="player-name"
+                                onDoubleClick={() => !result && !isReadOnly && handleRemovePlayerFromMatch(group.id, match.player2)}
+                                style={!result && !isReadOnly ? { cursor: 'pointer' } : {}}
+                                title={!result && !isReadOnly ? 'Dubbelklicka för att ta bort från match' : ''}
+                              >
+                                {match.player2}
+                              </span>
                             </div>
                             {!result && !isReadOnly && (
                               <button 
@@ -811,7 +842,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
             );
           })}
         </div>
-        {!isReadOnly && areAllMatchesReported() && !hasEmptyPlayoffSlots() && (
+        {!isReadOnly && isAdmin && areAllMatchesReported() && !hasEmptyPlayoffSlots() && (
           <button className="create-next-round-btn" onClick={handleCreateNextRound}>
             Skapa nästa omgång
           </button>
