@@ -1,0 +1,88 @@
+.login-modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.login-modal {
+  background: #222;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  padding: 32px 24px 24px 24px;
+  min-width: 320px;
+  max-width: 90vw;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.login-form h2 {
+  margin-bottom: 18px;
+  color: #f27b4a;
+  font-size: 1.5rem;
+}
+
+.login-input-group {
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 6px;
+  border: 1.5px solid #f27b4a;
+  font-size: 1rem;
+  background: #181818;
+  color: #fff;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.login-input:focus {
+  border: 2px solid #f27b4a;
+  box-shadow: 0 0 0 2px #f27b4a33;
+}
+
+.login-btn {
+  width: 100%;
+  background: #f27b4a;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 0;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.2s, color 0.2s;
+}
+.login-btn:hover {
+  background: #fff;
+  color: #f27b4a;
+  border: 1.5px solid #f27b4a;
+}
+
+.login-error {
+  color: #ff4a4a;
+  margin-top: 12px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .login-modal {
+    min-width: 90vw;
+    padding: 18px 4vw 18px 4vw;
+  }
+  .login-form h2 {
+    font-size: 1.1rem;
+  }
+}

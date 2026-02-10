@@ -1,0 +1,24 @@
+# Node
+FE/node_modules/
+FE/dist/
+
+# Java
+BE/target/
+BE/*.iml
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Database/logs
+BE/*.db
+BE/*.log
+BE/*.trace.db
+
+# Office/backup/temp
+~$*
+*.tmp
+*.xlsx
+*.docx
+nul

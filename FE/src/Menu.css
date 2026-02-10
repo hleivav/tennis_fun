@@ -1,0 +1,118 @@
+.main-menu {
+  /* ...existing code... */
+}
+
+@media (max-width: 900px) {
+  .main-menu ul {
+    padding: 0 10px;
+  }
+  .main-menu button, .menu-text {
+    padding: 8px 10px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-menu {
+    padding: 0;
+  }
+  .main-menu ul {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 2vw;
+  }
+  .main-menu li {
+    margin: 0 0 8px 0;
+  }
+  .main-menu button, .menu-text {
+    width: 100%;
+    text-align: left;
+    font-size: 1rem;
+    padding: 10px 8px;
+  }
+}
+.main-menu {
+  width: 100vw;
+  background: #282c34;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-top: 0;
+  display: flex;
+  justify-content: center;
+}
+.main-menu ul {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0 40px;
+}
+.main-menu li {
+  margin-right: 20px;
+}
+.menu-logo {
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+}
+.logo-img {
+  height: 38px;
+  width: auto;
+  opacity: 0.95;
+  transition: opacity 0.2s, transform 0.2s;
+}
+.logo-img:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+.main-menu button {
+  background: #f27b4a;
+  color: #fff;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 10px 18px;
+  border-radius: 4px;
+  margin: 10px 0;
+  transition: background 0.2s, color 0.2s;
+  font-weight: bold;
+}
+.main-menu button:hover {
+  background: #fff;
+  color: #f27b4a;
+}
+
+.logout-btn {
+  background: #fff;
+  color: #f27b4a;
+  border: 2px solid #f27b4a;
+  margin-left: 10px;
+  font-weight: bold;
+}
+.logout-btn:hover {
+  background: #f27b4a;
+  color: #fff;
+}
+
+.menu-text {
+  color: #fff;
+  font-size: 1rem;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-weight: bold;
+  transition: border 0.2s, color 0.2s, background 0.2s;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: inline-block;
+}
+.menu-text:hover {
+  border: 2px solid #f27b4a;
+  color: #f27b4a;
+  background: #fff1e7;
+}
+
+.menu-text.active {
+  border: 2px solid #f27b4a;
+  color: #fff;
+  background: #f27b4a;
+}

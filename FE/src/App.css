@@ -1,0 +1,69 @@
+.App {
+  /* ...existing code... */
+}
+
+@media (max-width: 900px) {
+  .App-header {
+    padding: 30px 10px 10px 10px;
+    font-size: 0.95rem;
+  }
+  .overlay {
+    padding: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .App-header {
+    margin-top: 20px;
+    padding: 20px 2vw 10px 2vw;
+    font-size: 0.9rem;
+  }
+  h1 {
+    font-size: 2rem;
+  }
+  .overlay {
+    padding: 0;
+  }
+}
+
+.App {
+  min-height: 100vh;
+  min-width: 100vw;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+}
+
+.overlay {
+  min-height: 100vh;
+  min-width: 100vw;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.no-overlay {
+  min-height: 100vh;
+  min-width: 100vw;
+  background: #0d1f29;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.App-header {
+  background-color: transparent;
+  padding: 40px 20px 20px 20px;
+  color: white;
+  border-radius: 8px;
+  margin-top: 40px;
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 10px 0;
+}

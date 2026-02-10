@@ -1,0 +1,141 @@
+.archived-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+}
+
+.archived-title {
+  color: #fff;
+  font-size: 2.2rem;
+  margin-bottom: 30px;
+  text-align: center;
+  border-bottom: 2px solid #f27b4a;
+  padding-bottom: 16px;
+}
+
+.loading {
+  background: #102732;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  color: #f27b4a;
+  font-size: 1.2rem;
+}
+
+.no-tournaments {
+  background: #102732;
+  border-radius: 12px;
+  padding: 60px 40px;
+  text-align: center;
+  color: #aaa;
+  font-size: 1.2rem;
+  font-style: italic;
+}
+
+.tournament-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tournament-card {
+  background: #102732;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.tournament-card:hover {
+  border-color: #f27b4a;
+  transform: translateX(8px);
+  box-shadow: 0 4px 16px rgba(242, 123, 74, 0.2);
+}
+
+.tournament-info {
+  flex: 1;
+}
+
+.tournament-name {
+  color: #fff;
+  font-size: 1.6rem;
+  margin: 0 0 8px 0;
+  font-weight: bold;
+}
+
+.tournament-date {
+  color: #f27b4a;
+  font-size: 1rem;
+  margin: 4px 0;
+}
+
+.tournament-participants {
+  color: #aaa;
+  font-size: 0.95rem;
+  margin: 4px 0;
+}
+
+.tournament-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.delete-btn {
+  background: #c44536;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-btn:hover {
+  background: #a33a2e;
+  transform: scale(1.1);
+}
+
+.view-arrow {
+  color: #f27b4a;
+  font-size: 3rem;
+  font-weight: bold;
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.tournament-card:hover .view-arrow {
+  opacity: 1;
+  transform: translateX(4px);
+}
+
+@media (max-width: 768px) {
+  .archived-container {
+    padding: 10px;
+  }
+
+  .archived-title {
+    font-size: 1.8rem;
+  }
+
+  .tournament-card {
+    padding: 20px;
+  }
+
+  .tournament-name {
+    font-size: 1.3rem;
+  }
+
+  .tournament-date {
+    font-size: 0.9rem;
+  }
+}
