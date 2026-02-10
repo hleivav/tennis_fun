@@ -67,10 +67,36 @@ Projektet är konfigurerat för lokal utveckling med:
 - Hot reload i både frontend och backend
 - CORS konfigurerad för lokal utveckling
 - H2 in-memory databas för snabb utveckling
-- Möjlighet att byta till MySQL för produktion
+- Möjlighet att byta till PostgreSQL för produktion
+
+## Deployment
+
+Projektet är förberett för deployment:
+- **Frontend**: Vercel
+- **Backend + Database**: Railway (PostgreSQL)
+
+Se detaljerad deployment-guide i [DEPLOYMENT.md](DEPLOYMENT.md)
+
+### Snabbstart för deployment
+
+1. **Backend till Railway**:
+   - Skapa projekt på Railway
+   - Lägg till PostgreSQL-databas
+   - Sätt miljövariabler: `SPRING_PROFILES_ACTIVE=prod`
+   - Deploy automatiskt från GitHub
+
+2. **Frontend till Vercel**:
+   - Skapa projekt på Vercel
+   - Sätt Root Directory: `FE`
+   - Lägg till miljövariabel: `VITE_API_URL=https://your-railway-app.up.railway.app/api`
+   - Deploy automatiskt från GitHub
 
 ## Nästa steg
 
+### Lokal utveckling
 1. Installera beroenden i frontend: `cd FE && npm install`
 2. Starta backend: `cd BE && mvn spring-boot:run`
 3. Starta frontend: `cd FE && npm run dev`
+
+### Production deployment
+Se [DEPLOYMENT.md](DEPLOYMENT.md) för fullständig guide.

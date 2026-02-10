@@ -1,0 +1,15 @@
+# Railway Deployment Configuration
+
+# This file helps Railway detect and build your Spring Boot application
+# Railway automatically detects Spring Boot projects, but this provides explicit configuration
+
+# Build command (optional - Railway auto-detects Maven)
+# Railway will run: mvn clean install -DskipTests
+
+# Start command (optional - Railway auto-detects Spring Boot)
+# Railway will run: java -jar target/*.jar
+
+# Make sure to set these environment variables in Railway:
+# - SPRING_PROFILES_ACTIVE=prod
+# - DATABASE_URL (automatically set when you add PostgreSQL)
+# - cors.allowed.origins=https://your-vercel-app.vercel.app
