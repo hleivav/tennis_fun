@@ -15,7 +15,7 @@ export default function Login({ onLogin }) {
       setError('Fel användarnamn eller lösenord');
     }
   };
-//en vanlig kommentar
+
   return (
     <div className="login-modal-bg">
       <div className="login-modal">
