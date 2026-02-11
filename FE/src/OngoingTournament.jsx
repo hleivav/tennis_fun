@@ -22,6 +22,40 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     }
   }, [tournamentData]);
 
+  // Automatisk uppdatering var 10:e sekund
+  useEffect(() => {
+    if (!tournament || isReadOnly || tournamentData) {
+      // Inget polling för arkiverade turneringar eller om tournamentData är given
+      return;
+    }
+
+    const intervalId = setInterval(() => {
+      refreshData();
+    }, 10000); // 10 sekunder
+
+    return () => clearInterval(intervalId);
+  }, [tournament, isReadOnly, tournamentData]);
+
+  // Uppdatera data i bakgrunden utan att visa loading-spinner
+  const refreshData = async () => {
+    if (!tournament) return;
+
+    try {
+      console.log('Uppdaterar data i bakgrunden...');
+      const fullTournament = await getTournamentById(tournament.id);
+      setTournament(fullTournament);
+      
+      // Uppdatera playoff setup för nya tomma grupper
+      initializePlayoffSetup(fullTournament);
+      
+      // Hämta matchresultat för alla grupper
+      await loadAllMatchResults(fullTournament.groups);
+    } catch (err) {
+      console.error('Fel vid uppdatering av data:', err);
+      // Fortsätt tysta, försök igen vid nästa intervall
+    }
+  };
+
   // Initiera playoff setup för tomma grupper
   const initializePlayoffSetup = (tournament) => {
     const newSetup = {};
