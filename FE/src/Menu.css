@@ -1,10 +1,74 @@
 .main-menu {
-  /* ...existing code... */
+  width: 100vw;
+  background: #282c34;
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menu-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+}
+
+.main-menu ul {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0 40px 10px 40px;
+  width: 100%;
+  justify-content: center;
+}
+
+.main-menu li {
+  margin-right: 20px;
+}
+
+/* Hamburgarikon - döljs på större skärmar */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  z-index: 1000;
+}
+
+.hamburger span {
+  width: 25px;
+  height: 3px;
+  background: #fff;
+  margin: 3px 0;
+  transition: all 0.3s ease;
+  border-radius: 2px;
+}
+
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translateY(9px);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-9px);
 }
 
 @media (max-width: 900px) {
   .main-menu ul {
-    padding: 0 10px;
+    padding: 0 20px 10px 20px;
+  }
+  .menu-header {
+    padding: 10px 20px;
   }
   .main-menu button, .menu-text {
     padding: 8px 10px;
@@ -12,43 +76,46 @@
   }
 }
 
-@media (max-width: 600px) {
-  .main-menu {
-    padding: 0;
+@media (max-width: 768px) {
+  .hamburger {
+    display: flex;
   }
+
+  .menu-header {
+    padding: 10px 20px;
+  }
+
   .main-menu ul {
     flex-direction: column;
-    align-items: flex-start;
-    padding: 0 2vw;
+    align-items: stretch;
+    padding: 0;
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
   }
+
+  .main-menu ul.menu-open {
+    max-height: 500px;
+    padding: 10px 20px 20px 20px;
+  }
+
   .main-menu li {
-    margin: 0 0 8px 0;
+    margin: 5px 0;
+    width: 100%;
   }
+
+  .main-menu li[style*="margin-left: auto"] {
+    margin-left: 0 !important;
+  }
+
   .main-menu button, .menu-text {
     width: 100%;
     text-align: left;
     font-size: 1rem;
-    padding: 10px 8px;
+    padding: 12px 15px;
+    display: block;
   }
-}
-.main-menu {
-  width: 100vw;
-  background: #282c34;
-  border-bottom: none;
-  margin-bottom: 0;
-  padding-top: 0;
-  display: flex;
-  justify-content: center;
-}
-.main-menu ul {
-  display: flex;
-  align-items: center;
-  list-style: none;
-  margin: 0;
-  padding: 0 40px;
-}
-.main-menu li {
-  margin-right: 20px;
 }
 .menu-logo {
   display: flex;

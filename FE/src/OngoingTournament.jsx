@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getAllTournaments, getTournamentById, reportMatch, updateMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants } from './services/api';
 import MatchReportModal from './MatchReportModal';
 import './OngoingTournament.css';
@@ -10,6 +10,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [matchResults, setMatchResults] = useState({}); // groupId -> array of results
   const [playoffSetup, setPlayoffSetup] = useState({}); // groupId -> { player1: null, player2: null, filled: false }
+  const pollingIntervalRef = useRef(null);
 
   useEffect(() => {
     if (!tournamentData) {
@@ -22,19 +23,31 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     }
   }, [tournamentData]);
 
-  // Automatisk uppdatering var 10:e sekund
+  // Automatisk uppdatering var 10:e sekund - startar bara en gång när tournament laddas
   useEffect(() => {
-    if (!tournament || isReadOnly || tournamentData) {
-      // Inget polling för arkiverade turneringar eller om tournamentData är given
-      return;
+    // Rensa tidigare intervall om det finns
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
     }
 
-    const intervalId = setInterval(() => {
-      refreshData();
-    }, 10000); // 10 sekunder
+    // Starta endast polling för aktiva turneringar (inte read-only)
+    if (tournament && !isReadOnly && !tournamentData) {
+      console.log('Startar automatisk uppdatering var 10:e sekund');
+      pollingIntervalRef.current = setInterval(() => {
+        refreshData();
+      }, 10000); // 10 sekunder
+    }
 
-    return () => clearInterval(intervalId);
-  }, [tournament, isReadOnly, tournamentData]);
+    // Cleanup-funktion
+    return () => {
+      if (pollingIntervalRef.current) {
+        console.log('Stoppar automatisk uppdatering');
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+    };
+  }, [tournament?.id, isReadOnly, tournamentData]); // Använd tournament.id istället för hela objektet
 
   // Uppdatera data i bakgrunden utan att visa loading-spinner
   const refreshData = async () => {
@@ -523,12 +536,10 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
         await reportMatch(reportData);
       }
       
-      // Uppdatera matchresultat för gruppen
-      const updatedResults = await getMatchResultsForGroup(reportData.groupId);
-      setMatchResults(prev => ({
-        ...prev,
-        [reportData.groupId]: updatedResults
-      }));
+      // Uppdatera hela turneringen och matchresultat direkt
+      const fullTournament = await getTournamentById(tournament.id);
+      setTournament(fullTournament);
+      await loadAllMatchResults(fullTournament.groups);
       
       setSelectedMatch(null);
       alert(isEditMode ? 'Match uppdaterad!' : 'Match rapporterad!');
