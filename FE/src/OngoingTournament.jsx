@@ -131,20 +131,6 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     }
   };
 
-  const loadAllMatchResults = async (groups) => {
-    const results = {};
-    for (const group of groups) {
-      try {
-        const groupResults = await getMatchResultsForGroup(group.id);
-        results[group.id] = groupResults;
-      } catch (error) {
-        console.error(`Fel vid hämtning av resultat för grupp ${group.id}:`, error);
-        results[group.id] = [];
-      }
-    }
-    setMatchResults(results);
-  };
-
   // Generera alla möjliga matcher för en grupp (round-robin)
   const generateMatches = (participants) => {
     // För knockout-grupper (exakt 2 spelare): visa bara 1 match
