@@ -23,19 +23,21 @@ export default function Menu({ isAdmin, currentView, onNavigate, onLoginClick, o
 
   return (
     <nav className="main-menu">
-      <button 
-        className={`hamburger ${isMenuOpen ? 'open' : ''}`}
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-        aria-label="Toggle menu"
-      >
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-      <ul className={isMenuOpen ? 'menu-open' : ''}>
-        <li className="menu-logo" onClick={() => handleNavigate('landing')} style={{cursor:'pointer'}}>
+      <div className="menu-header-mobile">
+        <div className="menu-logo" onClick={() => handleNavigate('landing')} style={{cursor:'pointer'}}>
           <img src={logan} alt="Tennis Fun logga" className="logo-img" />
-        </li>
+        </div>
+        <button 
+          className={`hamburger ${isMenuOpen ? 'open' : ''}`}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+      <ul className={isMenuOpen ? 'menu-open' : ''}>
         <li>
           <span 
             className={`menu-text ${currentView === 'landing' ? 'active' : ''}`} 
