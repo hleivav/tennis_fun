@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getAllTournaments, getTournamentById, reportMatch, updateMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants } from './services/api';
 import MatchReportModal from './MatchReportModal';
 import './OngoingTournament.css';
@@ -11,6 +11,43 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   const [matchResults, setMatchResults] = useState({}); // groupId -> array of results
   const [playoffSetup, setPlayoffSetup] = useState({}); // groupId -> { player1: null, player2: null, filled: false }
   const pollingIntervalRef = useRef(null);
+  const tournamentIdRef = useRef(null);
+
+  const loadAllMatchResults = async (groups) => {
+    const results = {};
+    for (const group of groups) {
+      try {
+        const groupResults = await getMatchResultsForGroup(group.id);
+        results[group.id] = groupResults;
+      } catch (error) {
+        console.error(`Fel vid hämtning av resultat för grupp ${group.id}:`, error);
+        results[group.id] = [];
+      }
+    }
+    setMatchResults(results);
+  };
+
+  // Uppdatera data i bakgrunden utan att visa loading-spinner
+  const refreshData = useCallback(async () => {
+    const currentId = tournamentIdRef.current;
+    if (!currentId) return;
+
+    try {
+      console.log('Uppdaterar data i bakgrunden... ID:', currentId);
+      const fullTournament = await getTournamentById(currentId);
+      setTournament(fullTournament);
+      
+      // Uppdatera playoff setup för nya tomma grupper
+      initializePlayoffSetup(fullTournament);
+      
+      // Hämta matchresultat för alla grupper
+      await loadAllMatchResults(fullTournament.groups);
+      console.log('Data uppdaterad!');
+    } catch (err) {
+      console.error('Fel vid uppdatering av data:', err);
+      // Fortsätt tysta, försök igen vid nästa intervall
+    }
+  }, []);
 
   useEffect(() => {
     if (!tournamentData) {
@@ -23,20 +60,16 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     }
   }, [tournamentData]);
 
-  // Automatisk uppdatering var 10:e sekund - startar bara en gång när tournament laddas
+  // Spara tournament ID och starta polling
   useEffect(() => {
-    // Rensa tidigare intervall om det finns
-    if (pollingIntervalRef.current) {
-      clearInterval(pollingIntervalRef.current);
-      pollingIntervalRef.current = null;
+    if (tournament?.id) {
+      tournamentIdRef.current = tournament.id;
     }
 
     // Starta endast polling för aktiva turneringar (inte read-only)
-    if (tournament && !isReadOnly && !tournamentData) {
-      console.log('Startar automatisk uppdatering var 10:e sekund');
-      pollingIntervalRef.current = setInterval(() => {
-        refreshData();
-      }, 10000); // 10 sekunder
+    if (tournament?.id && !isReadOnly && !tournamentData && !pollingIntervalRef.current) {
+      console.log('Startar automatisk uppdatering var 10:e sekund för ID:', tournament.id);
+      pollingIntervalRef.current = setInterval(refreshData, 10000);
     }
 
     // Cleanup-funktion
@@ -47,27 +80,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
         pollingIntervalRef.current = null;
       }
     };
-  }, [tournament?.id, isReadOnly, tournamentData]); // Använd tournament.id istället för hela objektet
-
-  // Uppdatera data i bakgrunden utan att visa loading-spinner
-  const refreshData = async () => {
-    if (!tournament) return;
-
-    try {
-      console.log('Uppdaterar data i bakgrunden...');
-      const fullTournament = await getTournamentById(tournament.id);
-      setTournament(fullTournament);
-      
-      // Uppdatera playoff setup för nya tomma grupper
-      initializePlayoffSetup(fullTournament);
-      
-      // Hämta matchresultat för alla grupper
-      await loadAllMatchResults(fullTournament.groups);
-    } catch (err) {
-      console.error('Fel vid uppdatering av data:', err);
-      // Fortsätt tysta, försök igen vid nästa intervall
-    }
-  };
+  }, [tournament?.id, isReadOnly, tournamentData, refreshData]);
 
   // Initiera playoff setup för tomma grupper
   const initializePlayoffSetup = (tournament) => {
