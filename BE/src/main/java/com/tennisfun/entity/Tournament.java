@@ -30,7 +30,7 @@ public class Tournament {
     @Column
     private Integer numberOfWinners;
 
-    @Column(nullable = false)
+    @Column
     private Integer gamesPerSet = 4;
     
     @Column(nullable = false, updatable = false)
