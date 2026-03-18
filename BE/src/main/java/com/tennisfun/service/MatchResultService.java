@@ -48,9 +48,12 @@ public class MatchResultService {
         result.setPlayer2(request.getPlayer2());
         result.setStatus(status);
 
+        int gamesPerSet = group.getTournament() != null && group.getTournament().getGamesPerSet() != null
+                ? group.getTournament().getGamesPerSet() : 4;
+
         switch (status) {
             case PLAYED:
-                validatePlayed(request);
+                validatePlayed(request, gamesPerSet);
                 result.setScore1(request.getScore1());
                 result.setScore2(request.getScore2());
                 // Vinnaren bestäms av poängen
@@ -63,7 +66,7 @@ public class MatchResultService {
                 result.setScore2(null);
                 break;
             case RETIRED:
-                validateRetired(request);
+                validateRetired(request, gamesPerSet);
                 result.setWinner(request.getWinner());
                 result.setScore1(request.getScore1());
                 result.setScore2(request.getScore2());
@@ -76,19 +79,19 @@ public class MatchResultService {
         return savedResult;
     }
 
-    private void validatePlayed(ReportMatchRequest request) {
+    private void validatePlayed(ReportMatchRequest request, int gamesPerSet) {
         if (request.getScore1() == null || request.getScore2() == null) {
             throw new IllegalArgumentException("Båda spelarna måste ha ett resultat för en spelad match.");
         }
         if (request.getScore1() < 0 || request.getScore2() < 0 ||
-            request.getScore1() > 4 || request.getScore2() > 4) {
-            throw new IllegalArgumentException("Resultatet måste vara mellan 0 och 4 games.");
+            request.getScore1() > gamesPerSet || request.getScore2() > gamesPerSet) {
+            throw new IllegalArgumentException("Resultatet måste vara mellan 0 och " + gamesPerSet + " games.");
         }
-        if (request.getScore1() != 4 && request.getScore2() != 4) {
-            throw new IllegalArgumentException("En spelare måste ha vunnit med 4 games.");
+        if (request.getScore1() != gamesPerSet && request.getScore2() != gamesPerSet) {
+            throw new IllegalArgumentException("En spelare måste ha vunnit med " + gamesPerSet + " games.");
         }
-        if (request.getScore1() == 4 && request.getScore2() == 4) {
-            throw new IllegalArgumentException("Båda kan inte ha 4 games.");
+        if (request.getScore1().equals(gamesPerSet) && request.getScore2().equals(gamesPerSet)) {
+            throw new IllegalArgumentException("Båda kan inte ha " + gamesPerSet + " games.");
         }
     }
 
@@ -101,14 +104,14 @@ public class MatchResultService {
         }
     }
 
-    private void validateRetired(ReportMatchRequest request) {
+    private void validateRetired(ReportMatchRequest request, int gamesPerSet) {
         validateWinner(request);
         if (request.getScore1() == null || request.getScore2() == null) {
             throw new IllegalArgumentException("Resultat måste anges vid uppgiven match.");
         }
         if (request.getScore1() < 0 || request.getScore2() < 0 ||
-            request.getScore1() >= 4 || request.getScore2() >= 4) {
-            throw new IllegalArgumentException("Resultatet vid uppgiven match får inte vara 4.");
+            request.getScore1() >= gamesPerSet || request.getScore2() >= gamesPerSet) {
+            throw new IllegalArgumentException("Resultatet vid uppgiven match får inte vara " + gamesPerSet + ".");
         }
     }
     
@@ -119,12 +122,17 @@ public class MatchResultService {
         MatchResult existingResult = matchResultRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Matchresultat med ID " + id + " hittades inte"));
 
+        TournamentGroup existingGroup = groupRepository.findById(existingResult.getGroup().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Grupp hittades inte"));
+        int gamesPerSet = existingGroup.getTournament() != null && existingGroup.getTournament().getGamesPerSet() != null
+                ? existingGroup.getTournament().getGamesPerSet() : 4;
+
         MatchStatus status = MatchStatus.valueOf(request.getStatus().toUpperCase());
         existingResult.setStatus(status);
 
         switch (status) {
             case PLAYED:
-                validatePlayed(request);
+                validatePlayed(request, gamesPerSet);
                 existingResult.setScore1(request.getScore1());
                 existingResult.setScore2(request.getScore2());
                 existingResult.setWinner(request.getScore1() > request.getScore2() ? existingResult.getPlayer1() : existingResult.getPlayer2());
@@ -136,7 +144,7 @@ public class MatchResultService {
                 existingResult.setScore2(null);
                 break;
             case RETIRED:
-                validateRetired(request);
+                validateRetired(request, gamesPerSet);
                 existingResult.setWinner(request.getWinner());
                 existingResult.setScore1(request.getScore1());
                 existingResult.setScore2(request.getScore2());
