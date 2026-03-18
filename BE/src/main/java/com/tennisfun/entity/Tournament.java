@@ -29,6 +29,9 @@ public class Tournament {
     
     @Column
     private Integer numberOfWinners;
+
+    @Column(nullable = false)
+    private Integer gamesPerSet = 4;
     
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

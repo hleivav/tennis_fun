@@ -57,6 +57,7 @@ public class TournamentService {
         tournament.setName(request.getName().trim());
         tournament.setDate(LocalDate.parse(request.getDate(), DateTimeFormatter.ISO_LOCAL_DATE));
         tournament.setNumberOfWinners(request.getNumberOfWinners() != null ? request.getNumberOfWinners() : 1);
+        tournament.setGamesPerSet(request.getGamesPerSet() != null ? request.getGamesPerSet() : 4);
         
         // Skapa TournamentGroup entities för icke-tomma grupper
         for (TournamentGroupDTO groupDTO : nonEmptyGroups) {

@@ -5,6 +5,7 @@ import { createTournament, getActiveTournaments, deleteAllTournaments, archiveTo
 export default function AdminForm() {
   const [tournamentName, setTournamentName] = useState('');
   const [date, setDate] = useState('');
+  const [gamesPerSet, setGamesPerSet] = useState(4);
   const [playerName, setPlayerName] = useState('');
   const [participantList, setParticipantList] = useState('');
   const [groups, setGroups] = useState(Array(9).fill().map(() => []));
@@ -257,6 +258,7 @@ export default function AdminForm() {
       const tournamentData = {
         name: tournamentName.trim(),
         date: date, // Format: YYYY-MM-DD (från input type="date")
+        gamesPerSet: gamesPerSet,
         groups: groups.map((group, index) => ({
           groupNumber: index + 1,
           participants: group,
@@ -280,6 +282,7 @@ export default function AdminForm() {
       // Återställ formuläret
       setTournamentName('');
       setDate('');
+      setGamesPerSet(4);
       setPlayerName('');
       setParticipantList('');
       setGroups(Array(9).fill().map(() => []));
@@ -323,6 +326,37 @@ export default function AdminForm() {
                 className="form-input"
                 disabled={hasTournament}
               />
+            </div>
+          </div>
+        </div>
+
+        <div className="form-section">
+          <h3 className="section-title">Matchformat</h3>
+          <div className="form-group">
+            <label>Antal games per set</label>
+            <div className="games-per-set-selector">
+              <label className={`games-option ${gamesPerSet === 4 ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="gamesPerSet"
+                  value={4}
+                  checked={gamesPerSet === 4}
+                  onChange={() => setGamesPerSet(4)}
+                  disabled={hasTournament}
+                />
+                4 games
+              </label>
+              <label className={`games-option ${gamesPerSet === 6 ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="gamesPerSet"
+                  value={6}
+                  checked={gamesPerSet === 6}
+                  onChange={() => setGamesPerSet(6)}
+                  disabled={hasTournament}
+                />
+                6 games
+              </label>
             </div>
           </div>
         </div>

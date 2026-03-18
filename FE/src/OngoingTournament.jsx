@@ -900,6 +900,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
           onClose={() => setSelectedMatch(null)}
           onSubmit={handleReportSubmit}
           existingResult={selectedMatch.existingResult}
+          gamesPerSet={tournament?.gamesPerSet ?? 4}
         />
       )}
     </div>

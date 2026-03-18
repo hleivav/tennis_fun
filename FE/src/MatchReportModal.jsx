@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './MatchReportModal.css';
 
-export default function MatchReportModal({ match, groupId, onClose, onSubmit, existingResult = null }) {
+export default function MatchReportModal({ match, groupId, onClose, onSubmit, existingResult = null, gamesPerSet = 4 }) {
   const [status, setStatus] = useState(existingResult ? existingResult.status : 'PLAYED');
   const [winner, setWinner] = useState(existingResult ? existingResult.winner : '');
   const [score1, setScore1] = useState(existingResult && existingResult.score1 !== null ? existingResult.score1.toString() : '');
@@ -24,16 +24,16 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
         alert('Båda spelarna måste ha ett resultat för en spelad match.');
         return;
       }
-      if (s1 < 0 || s2 < 0 || s1 > 4 || s2 > 4) {
-        alert('Resultatet måste vara mellan 0 och 4 games.');
+      if (s1 < 0 || s2 < 0 || s1 > gamesPerSet || s2 > gamesPerSet) {
+        alert(`Resultatet måste vara mellan 0 och ${gamesPerSet} games.`);
         return;
       }
-      if (s1 !== 4 && s2 !== 4) {
-        alert('En spelare måste ha vunnit med 4 games.');
+      if (s1 !== gamesPerSet && s2 !== gamesPerSet) {
+        alert(`En spelare måste ha vunnit med ${gamesPerSet} games.`);
         return;
       }
-      if (s1 === 4 && s2 === 4) {
-        alert('Båda kan inte ha 4 games.');
+      if (s1 === gamesPerSet && s2 === gamesPerSet) {
+        alert(`Båda kan inte ha ${gamesPerSet} games.`);
         return;
       }
     } else if (status === 'WALKOVER' || status === 'RETIRED') {
@@ -48,8 +48,8 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
             alert('Resultat måste anges vid uppgiven match.');
             return;
         }
-        if (s1 >= 4 || s2 >= 4) {
-            alert('Inget resultat får vara 4 vid uppgiven match.');
+        if (s1 >= gamesPerSet || s2 >= gamesPerSet) {
+            alert(`Inget resultat får vara ${gamesPerSet} vid uppgiven match.`);
             return;
         }
     }
@@ -84,10 +84,10 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
           <input
             type="number"
             min="0"
-            max={status === 'RETIRED' ? '3' : '4'}
+            max={status === 'RETIRED' ? gamesPerSet - 1 : gamesPerSet}
             value={score1}
             onChange={(e) => setScore1(e.target.value)}
-            placeholder="0-4"
+            placeholder={`0-${gamesPerSet}`}
             autoFocus
           />
           <span className="games-label">games</span>
@@ -100,10 +100,10 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
           <input
             type="number"
             min="0"
-            max={status === 'RETIRED' ? '3' : '4'}
+            max={status === 'RETIRED' ? gamesPerSet - 1 : gamesPerSet}
             value={score2}
             onChange={(e) => setScore2(e.target.value)}
-            placeholder="0-4"
+            placeholder={`0-${gamesPerSet}`}
           />
           <span className="games-label">games</span>
         </div>
