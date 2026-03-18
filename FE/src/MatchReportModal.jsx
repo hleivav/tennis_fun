@@ -24,17 +24,29 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
         alert('Båda spelarna måste ha ett resultat för en spelad match.');
         return;
       }
-      if (s1 < 0 || s2 < 0 || s1 > gamesPerSet || s2 > gamesPerSet) {
-        alert(`Resultatet måste vara mellan 0 och ${gamesPerSet} games.`);
-        return;
-      }
-      if (s1 !== gamesPerSet && s2 !== gamesPerSet) {
-        alert(`En spelare måste ha vunnit med ${gamesPerSet} games.`);
-        return;
-      }
-      if (s1 === gamesPerSet && s2 === gamesPerSet) {
-        alert(`Båda kan inte ha ${gamesPerSet} games.`);
-        return;
+      if (gamesPerSet === 6) {
+        const valid =
+          (s1 === 6 && s2 <= 4) ||
+          (s2 === 6 && s1 <= 4) ||
+          (s1 === 7 && (s2 === 5 || s2 === 6)) ||
+          (s2 === 7 && (s1 === 5 || s1 === 6));
+        if (!valid) {
+          alert('Ogiltigt resultat. Giltiga ställningar är t.ex. 6-0 till 6-4, 7-5 eller 7-6 (tie-break).');
+          return;
+        }
+      } else {
+        if (s1 < 0 || s2 < 0 || s1 > gamesPerSet || s2 > gamesPerSet) {
+          alert(`Resultatet måste vara mellan 0 och ${gamesPerSet} games.`);
+          return;
+        }
+        if (s1 !== gamesPerSet && s2 !== gamesPerSet) {
+          alert(`En spelare måste ha vunnit med ${gamesPerSet} games.`);
+          return;
+        }
+        if (s1 === gamesPerSet && s2 === gamesPerSet) {
+          alert(`Båda kan inte ha ${gamesPerSet} games.`);
+          return;
+        }
       }
     } else if (status === 'WALKOVER' || status === 'RETIRED') {
       if (!winner) {
@@ -42,16 +54,28 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
         return;
       }
     }
-    
+
     if (status === 'RETIRED') {
-        if (s1 === null || s2 === null) {
-            alert('Resultat måste anges vid uppgiven match.');
-            return;
-        }
-        if (s1 >= gamesPerSet || s2 >= gamesPerSet) {
-            alert(`Inget resultat får vara ${gamesPerSet} vid uppgiven match.`);
-            return;
-        }
+      if (s1 === null || s2 === null) {
+        alert('Resultat måste anges vid uppgiven match.');
+        return;
+      }
+      const maxRetired = gamesPerSet === 6 ? 7 : gamesPerSet;
+      if (s1 < 0 || s2 < 0 || s1 >= maxRetired || s2 >= maxRetired) {
+        alert('Resultatet vid uppgiven match är ogiltigt.');
+        return;
+      }
+      // Kontrollera att ingen spelare har ett komplett vinnande resultat
+      const p1Won = gamesPerSet === 6
+        ? ((s1 === 6 && s2 <= 4) || (s1 === 7 && (s2 === 5 || s2 === 6)))
+        : s1 === gamesPerSet;
+      const p2Won = gamesPerSet === 6
+        ? ((s2 === 6 && s1 <= 4) || (s2 === 7 && (s1 === 5 || s1 === 6)))
+        : s2 === gamesPerSet;
+      if (p1Won || p2Won) {
+        alert('Uppgiven match kan inte ha ett komplett vinnande resultat.');
+        return;
+      }
     }
 
     // Skicka resultat
@@ -84,10 +108,10 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
           <input
             type="number"
             min="0"
-            max={status === 'RETIRED' ? gamesPerSet - 1 : gamesPerSet}
+            max={gamesPerSet === 6 ? 7 : (status === 'RETIRED' ? gamesPerSet - 1 : gamesPerSet)}
             value={score1}
             onChange={(e) => setScore1(e.target.value)}
-            placeholder={`0-${gamesPerSet}`}
+            placeholder={gamesPerSet === 6 ? '0-7' : `0-${gamesPerSet}`}
             autoFocus
           />
           <span className="games-label">games</span>
@@ -100,10 +124,10 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
           <input
             type="number"
             min="0"
-            max={status === 'RETIRED' ? gamesPerSet - 1 : gamesPerSet}
+            max={gamesPerSet === 6 ? 7 : (status === 'RETIRED' ? gamesPerSet - 1 : gamesPerSet)}
             value={score2}
             onChange={(e) => setScore2(e.target.value)}
-            placeholder={`0-${gamesPerSet}`}
+            placeholder={gamesPerSet === 6 ? '0-7' : `0-${gamesPerSet}`}
           />
           <span className="games-label">games</span>
         </div>

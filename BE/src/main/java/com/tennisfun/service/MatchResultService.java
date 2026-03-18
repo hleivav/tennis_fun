@@ -83,15 +83,30 @@ public class MatchResultService {
         if (request.getScore1() == null || request.getScore2() == null) {
             throw new IllegalArgumentException("Båda spelarna måste ha ett resultat för en spelad match.");
         }
-        if (request.getScore1() < 0 || request.getScore2() < 0 ||
-            request.getScore1() > gamesPerSet || request.getScore2() > gamesPerSet) {
-            throw new IllegalArgumentException("Resultatet måste vara mellan 0 och " + gamesPerSet + " games.");
-        }
-        if (request.getScore1() != gamesPerSet && request.getScore2() != gamesPerSet) {
-            throw new IllegalArgumentException("En spelare måste ha vunnit med " + gamesPerSet + " games.");
-        }
-        if (request.getScore1().equals(gamesPerSet) && request.getScore2().equals(gamesPerSet)) {
-            throw new IllegalArgumentException("Båda kan inte ha " + gamesPerSet + " games.");
+        int s1 = request.getScore1();
+        int s2 = request.getScore2();
+
+        if (gamesPerSet == 6) {
+            // Giltiga ställningar: vinnaren har 6 med minst 2 i försprung, eller 7-5, eller 7-6 (tie-break)
+            boolean valid = (s1 == 6 && s2 <= 4) ||
+                            (s2 == 6 && s1 <= 4) ||
+                            (s1 == 7 && (s2 == 5 || s2 == 6)) ||
+                            (s2 == 7 && (s1 == 5 || s1 == 6));
+            if (!valid) {
+                throw new IllegalArgumentException(
+                    "Ogiltigt resultat. Giltiga ställningar är t.ex. 6-0 till 6-4, 7-5 eller 7-6 (tie-break).");
+            }
+        } else {
+            // 4-games-set: vinnaren måste ha exakt 4 (4-0, 4-1, 4-2, 4-3)
+            if (s1 < 0 || s2 < 0 || s1 > gamesPerSet || s2 > gamesPerSet) {
+                throw new IllegalArgumentException("Resultatet måste vara mellan 0 och " + gamesPerSet + " games.");
+            }
+            if (s1 != gamesPerSet && s2 != gamesPerSet) {
+                throw new IllegalArgumentException("En spelare måste ha vunnit med " + gamesPerSet + " games.");
+            }
+            if (s1 == gamesPerSet && s2 == gamesPerSet) {
+                throw new IllegalArgumentException("Båda kan inte ha " + gamesPerSet + " games.");
+            }
         }
     }
 
@@ -109,9 +124,21 @@ public class MatchResultService {
         if (request.getScore1() == null || request.getScore2() == null) {
             throw new IllegalArgumentException("Resultat måste anges vid uppgiven match.");
         }
-        if (request.getScore1() < 0 || request.getScore2() < 0 ||
-            request.getScore1() >= gamesPerSet || request.getScore2() >= gamesPerSet) {
-            throw new IllegalArgumentException("Resultatet vid uppgiven match får inte vara " + gamesPerSet + ".");
+        int s1 = request.getScore1();
+        int s2 = request.getScore2();
+        int maxScore = gamesPerSet == 6 ? 7 : gamesPerSet;
+        if (s1 < 0 || s2 < 0 || s1 >= maxScore || s2 >= maxScore) {
+            throw new IllegalArgumentException("Resultatet vid uppgiven match är ogiltigt.");
+        }
+        // Ingen spelare får ha ett komplett vinnande resultat
+        boolean p1Won = (gamesPerSet == 6)
+                ? ((s1 == 6 && s2 <= 4) || (s1 == 7 && (s2 == 5 || s2 == 6)))
+                : (s1 == gamesPerSet);
+        boolean p2Won = (gamesPerSet == 6)
+                ? ((s2 == 6 && s1 <= 4) || (s2 == 7 && (s1 == 5 || s1 == 6)))
+                : (s2 == gamesPerSet);
+        if (p1Won || p2Won) {
+            throw new IllegalArgumentException("Uppgiven match kan inte ha ett komplett vinnande resultat.");
         }
     }
     
