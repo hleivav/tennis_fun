@@ -12,6 +12,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   const [playoffSetup, setPlayoffSetup] = useState({}); // groupId -> { player1: null, player2: null, filled: false }
   const pollingIntervalRef = useRef(null);
   const tournamentIdRef = useRef(null);
+  const isPlacingPlayerRef = useRef(false);
 
   const loadAllMatchResults = async (groups) => {
     const results = {};
@@ -84,16 +85,20 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
 
   // Initiera playoff setup för tomma grupper
   const initializePlayoffSetup = (tournament) => {
-    const newSetup = {};
-    tournament.groups.forEach(group => {
-      if (group.participants.length === 0) {
-        newSetup[group.id] = { player1: null, player2: null, filled: false };
+    setPlayoffSetup(prevSetup => {
+      const newSetup = {};
+      tournament.groups.forEach(group => {
+        if (group.participants.length === 0) {
+          // Bevära befintlig partiell placering (player1 satt men inte player2)
+          newSetup[group.id] = prevSetup[group.id] || { player1: null, player2: null, filled: false };
+        }
+      });
+      if (Object.keys(newSetup).length > 0) {
+        console.log('Initierar playoff setup:', newSetup);
+        return newSetup;
       }
+      return prevSetup;
     });
-    if (Object.keys(newSetup).length > 0) {
-      console.log('Initierar playoff setup:', newSetup);
-      setPlayoffSetup(newSetup); // Ersätt helt
-    }
   };
 
   const loadLatestTournament = async () => {
@@ -453,7 +458,11 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
 
   const handlePlayerDoubleClick = async (playerName) => {
     if (isReadOnly) return;
-    
+    // Prevent re-entrancy: block if a placement is already in progress
+    if (isPlacingPlayerRef.current) return;
+    isPlacingPlayerRef.current = true;
+
+    try {
     // Hitta första tomma slotten i playoff setup
     const emptyGroups = Object.entries(playoffSetup)
       .filter(([_, setup]) => !setup.filled)
@@ -505,6 +514,9 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     }
     
     setPlayoffSetup(newSetup);
+    } finally {
+      isPlacingPlayerRef.current = false;
+    }
   };
 
   // Funktion för att ta bort en spelare från en match

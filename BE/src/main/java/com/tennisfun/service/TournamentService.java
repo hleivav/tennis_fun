@@ -243,6 +243,10 @@ public class TournamentService {
             throw new IllegalArgumentException("En knockout-match måste ha exakt 2 deltagare");
         }
         
+        if (participants.get(0).equals(participants.get(1))) {
+            throw new IllegalArgumentException("En spelare kan inte möta sig själv");
+        }
+        
         group.setParticipants(new ArrayList<>(participants));
         TournamentGroup updatedGroup = groupRepository.save(group);
         
