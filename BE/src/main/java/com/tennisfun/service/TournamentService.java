@@ -61,6 +61,12 @@ public class TournamentService {
         
         // Skapa TournamentGroup entities för icke-tomma grupper
         for (TournamentGroupDTO groupDTO : nonEmptyGroups) {
+            List<String> participants = groupDTO.getParticipants();
+            long distinctCount = participants.stream().map(String::trim).distinct().count();
+            if (distinctCount < participants.size()) {
+                throw new IllegalArgumentException("Grupp " + groupDTO.getGroupNumber() + " innehåller duplicerade spelarnamn");
+            }
+
             TournamentGroup group = new TournamentGroup();
             group.setGroupNumber(groupDTO.getGroupNumber());
             group.setParticipants(groupDTO.getParticipants());
