@@ -65,6 +65,10 @@ export const updateMatch = async (matchId, matchData) => {
   return response.data;
 };
 
+export const deleteMatch = async (matchId) => {
+  await api.delete(`/matches/${matchId}`);
+};
+
 export const getMatchResultsForGroup = async (groupId) => {
   const response = await api.get(`/matches/group/${groupId}`);
   return response.data;

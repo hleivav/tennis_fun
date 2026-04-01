@@ -276,6 +276,15 @@ public class MatchResultService {
         return updatedResult;
     }
     
+    @Transactional
+    public void deleteMatchResult(Long id) {
+        if (!matchResultRepository.existsById(id)) {
+            throw new IllegalArgumentException("Matchresultat med ID " + id + " hittades inte");
+        }
+        matchResultRepository.deleteById(id);
+        log.info("Match result with ID {} deleted", id);
+    }
+
     @Transactional(readOnly = true)
     public List<MatchResult> getMatchResultsForGroup(Long groupId) {
         return matchResultRepository.findByGroupId(groupId);

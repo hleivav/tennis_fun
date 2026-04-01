@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getAllTournaments, getTournamentById, reportMatch, updateMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants } from './services/api';
+import { getAllTournaments, getTournamentById, reportMatch, updateMatch, deleteMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants } from './services/api';
 import MatchReportModal from './MatchReportModal';
 import './OngoingTournament.css';
 
@@ -594,6 +594,21 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     }
   };
 
+  const handleResetMatch = async (matchId) => {
+    if (!window.confirm('Är du säker på att du vill nollställa det rapporterade resultatet? Matchen kan sedan rapporteras på nytt.')) return;
+    try {
+      await deleteMatch(matchId);
+      const fullTournament = await getTournamentById(tournament.id);
+      setTournament(fullTournament);
+      await loadAllMatchResults(fullTournament.groups);
+      setSelectedMatch(null);
+      alert('Matchresultatet är nollställt.');
+    } catch (error) {
+      console.error('Fel vid nollställning av match:', error);
+      alert(`Fel: ${error.response?.data?.message || 'Ett fel uppstod vid nollställning'}`);
+    }
+  };
+
   const handleCreateNextRound = async () => {
     let numberOfPlayers;
     
@@ -961,6 +976,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
           groupId={selectedMatch.groupId}
           onClose={() => setSelectedMatch(null)}
           onSubmit={handleReportSubmit}
+          onReset={handleResetMatch}
           existingResult={selectedMatch.existingResult}
           gamesPerSet={tournament?.gamesPerSet ?? 4}
           setsPerMatch={tournament?.setsPerMatch ?? 'ett-set'}

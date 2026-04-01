@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './MatchReportModal.css';
 
-export default function MatchReportModal({ match, groupId, onClose, onSubmit, existingResult = null, gamesPerSet = 4, setsPerMatch = 'ett-set' }) {
+export default function MatchReportModal({ match, groupId, onClose, onSubmit, onReset, existingResult = null, gamesPerSet = 4, setsPerMatch = 'ett-set' }) {
   const [status, setStatus] = useState(existingResult ? existingResult.status : 'PLAYED');
   const [winner, setWinner] = useState(existingResult ? existingResult.winner : '');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,32 +40,21 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
     const s1 = parseInt(s.score1);
     const s2 = parseInt(s.score2);
     if (isNaN(s1) || isNaN(s2)) return false;
-    if (gamesPerSet === 6) return s1 === 6 && s2 === 6;
-    return s1 === (gamesPerSet - 1) && s2 === (gamesPerSet - 1);
+    if (gamesPerSet === 6) return (s1 === 7 && s2 === 6) || (s1 === 6 && s2 === 7);
+    return (s1 === gamesPerSet && s2 === gamesPerSet - 1) || (s1 === gamesPerSet - 1 && s2 === gamesPerSet);
   };
 
   const getTiebreakMax = () => gamesPerSet === 6 ? 7 : gamesPerSet + 1;
   const getMaxGames = () => gamesPerSet === 6 ? 7 : gamesPerSet;
 
-  // Determine who won a set: true = player1, false = player2, null = undetermined
-  const didPlayer1WinSet = (s1, s2, tb1Str, tb2Str) => {
+  // Determine who won a set: true = player1, false = player2, null = invalid/undetermined
+  const didPlayer1WinSet = (s1, s2) => {
     if (gamesPerSet === 6) {
-      if (s1 === 6 && s2 <= 4) return true;
-      if (s2 === 6 && s1 <= 4) return false;
-      if (s1 === 7 && (s2 === 5 || s2 === 6)) return true;
-      if (s2 === 7 && (s1 === 5 || s1 === 6)) return false;
-      if (s1 === 6 && s2 === 6) {
-        const t1 = parseInt(tb1Str), t2 = parseInt(tb2Str);
-        if (!isNaN(t1) && !isNaN(t2) && t1 !== t2) return t1 > t2;
-      }
+      if ((s1 === 6 && s2 <= 4) || (s1 === 7 && (s2 === 5 || s2 === 6))) return true;
+      if ((s2 === 6 && s1 <= 4) || (s2 === 7 && (s1 === 5 || s1 === 6))) return false;
     } else {
       if (s1 === gamesPerSet && s2 < gamesPerSet) return true;
       if (s2 === gamesPerSet && s1 < gamesPerSet) return false;
-      const tiePoint = gamesPerSet - 1;
-      if (s1 === tiePoint && s2 === tiePoint) {
-        const t1 = parseInt(tb1Str), t2 = parseInt(tb2Str);
-        if (!isNaN(t1) && !isNaN(t2) && t1 !== t2) return t1 > t2;
-      }
     }
     return null;
   };
@@ -77,7 +66,7 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
       const s = sets[i];
       const s1 = parseInt(s.score1), s2 = parseInt(s.score2);
       if (isNaN(s1) || isNaN(s2)) continue;
-      const result = didPlayer1WinSet(s1, s2, s.tb1, s.tb2);
+      const result = didPlayer1WinSet(s1, s2);
       if (result === true) p1++;
       if (result === false) p2++;
     }
@@ -105,7 +94,7 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
         if (s2 === 10 && s1 < 10) return match.player2;
         return null;
       } else {
-        const result = didPlayer1WinSet(s1, s2, s.tb1, s.tb2);
+        const result = didPlayer1WinSet(s1, s2);
         if (result === true) return match.player1;
         if (result === false) return match.player2;
         return null;
@@ -183,13 +172,17 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
           alert(`Set ${i + 1}: Båda spelarna måste ha ett resultat.`);
           return false;
         }
-        const setWinner = didPlayer1WinSet(s1, s2, s.tb1, s.tb2);
+        const tied = gamesPerSet === 6 ? (s1 === 6 && s2 === 6) : (s1 === gamesPerSet - 1 && s2 === gamesPerSet - 1);
+        if (tied) {
+          const tie = gamesPerSet - 1;
+          alert(gamesPerSet === 6
+            ? `Set ${i + 1}: Ställningen 6-6 är ogiltig. Ange 7-6 eller 6-7 för ett set avgjort med tiebreak.`
+            : `Set ${i + 1}: Ställningen ${tie}-${tie} är ogiltig. Ange ${gamesPerSet}-${tie} eller ${tie}-${gamesPerSet} för ett set avgjort med tiebreak.`);
+          return false;
+        }
+        const setWinner = didPlayer1WinSet(s1, s2);
         if (setWinner === null) {
-          if (needsTiebreak(i)) {
-            alert(`Set ${i + 1}: Tiebreak-resultat måste anges.`);
-          } else {
-            alert(`Set ${i + 1}: Ogiltigt resultat.`);
-          }
+          alert(`Set ${i + 1}: Ogiltigt resultat.`);
           return false;
         }
       }
@@ -208,13 +201,17 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
             return false;
           }
         } else {
-          const setWinner = didPlayer1WinSet(s1, s2, s.tb1, s.tb2);
+          const tied = gamesPerSet === 6 ? (s1 === 6 && s2 === 6) : (s1 === gamesPerSet - 1 && s2 === gamesPerSet - 1);
+          if (tied) {
+            const tie = gamesPerSet - 1;
+            alert(gamesPerSet === 6
+              ? 'Set 3: Ställningen 6-6 är ogiltig. Ange 7-6 eller 6-7 för ett set avgjort med tiebreak.'
+              : `Set 3: Ställningen ${tie}-${tie} är ogiltig. Ange ${gamesPerSet}-${tie} eller ${tie}-${gamesPerSet} för ett set avgjort med tiebreak.`);
+            return false;
+          }
+          const setWinner = didPlayer1WinSet(s1, s2);
           if (setWinner === null) {
-            if (needsTiebreak(2)) {
-              alert('Set 3: Tiebreak-resultat måste anges.');
-            } else {
-              alert('Set 3: Ogiltigt resultat.');
-            }
+            alert('Set 3: Ogiltigt resultat.');
             return false;
           }
         }
@@ -329,7 +326,7 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
         </div>
         {needsTiebreak(setIndex) && (
           <div className="tiebreak-section">
-            <span className="tiebreak-label">Tiebreak (först till {getTiebreakMax()})</span>
+            <span className="tiebreak-label">Tiebreak-poäng (valfritt)</span>
             <div className="set-scores tiebreak-scores">
               <div className="set-player-input">
                 <input
@@ -514,6 +511,11 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, ex
             <button type="submit" className="submit-match-btn" disabled={isSubmitting}>
               {isSubmitting ? 'Sparar...' : (isEditMode ? 'Uppdatera' : 'Rapportera')}
             </button>
+            {isEditMode && onReset && (
+              <button type="button" onClick={() => onReset(existingResult.id)} className="reset-match-btn" disabled={isSubmitting}>
+                Nollställ
+              </button>
+            )}
             <button type="button" onClick={onClose} className="cancel-btn" disabled={isSubmitting}>
               Avbryt
             </button>

@@ -129,6 +129,23 @@
   transform: translateY(0);
 }
 
+.reset-match-btn {
+  background: transparent;
+  color: #e05c5c;
+  border: 2px solid #e05c5c;
+  border-radius: 8px;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.reset-match-btn:hover {
+  background: #e05c5c;
+  color: #fff;
+}
+
 .cancel-btn {
   background: transparent;
   color: #fff;

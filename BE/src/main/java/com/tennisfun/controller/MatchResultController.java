@@ -51,6 +51,22 @@ public class MatchResultController {
         }
     }
     
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteMatch(@PathVariable Long id) {
+        try {
+            log.info("Deleting match result with ID: {}", id);
+            matchResultService.deleteMatchResult(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            log.error("Validation error: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error deleting match", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Ett fel uppstod vid borttagning av match"));
+        }
+    }
+
     @GetMapping("/group/{groupId}")
     public ResponseEntity<List<MatchResult>> getMatchResultsForGroup(@PathVariable Long groupId) {
         log.info("Fetching match results for group: {}", groupId);
