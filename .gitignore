@@ -22,3 +22,5 @@ BE/*.trace.db
 *.xlsx
 *.docx
 nul
+.vercel
+.env*.local

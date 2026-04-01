@@ -381,6 +381,20 @@
   color: #aaa;
 }
 
+.match-format-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0 28px;
+  align-items: start;
+}
+
+.match-format-divider {
+  width: 1px;
+  background: rgba(242, 123, 74, 0.3);
+  align-self: stretch;
+  min-height: 60px;
+}
+
 .games-per-set-selector {
   display: flex;
   gap: 16px;

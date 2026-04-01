@@ -14,5 +14,6 @@ public class CreateTournamentRequest {
     private String date; // Format: YYYY-MM-DD
     private Integer numberOfWinners;
     private Integer gamesPerSet;
+    private String setsPerMatch;
     private List<TournamentGroupDTO> groups;
 }

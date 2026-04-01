@@ -182,40 +182,74 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     return points;
   };
 
-  // Beräkna setskillnad för en spelare i en grupp
+  // Beräkna setskillnad för en spelare i en grupp (summerar games över alla set)
   const calculateSetDifference = (groupId, playerName) => {
     const results = matchResults[groupId] || [];
     let gamesWon = 0;
     let gamesLost = 0;
 
     results.forEach(result => {
-      if (result.player1 === playerName) {
-        gamesWon += result.score1;
-        gamesLost += result.score2;
-      } else if (result.player2 === playerName) {
-        gamesWon += result.score2;
-        gamesLost += result.score1;
-      }
+      const isP1 = result.player1 === playerName;
+      const isP2 = result.player2 === playerName;
+      if (!isP1 && !isP2) return;
+
+      const addGames = (s1, s2) => {
+        if (s1 == null || s2 == null) return;
+        if (isP1) { gamesWon += s1; gamesLost += s2; }
+        else { gamesWon += s2; gamesLost += s1; }
+      };
+
+      addGames(result.score1, result.score2);
+      addGames(result.set2Score1, result.set2Score2);
+      addGames(result.set3Score1, result.set3Score2);
     });
 
     return gamesWon - gamesLost;
   };
 
-  // Beräkna totalt antal vunna games för en spelare
+  // Beräkna totalt antal vunna games för en spelare (över alla set)
   const calculateGamesWon = (groupId, playerName) => {
     const results = matchResults[groupId] || [];
     let gamesWon = 0;
 
     results.forEach(result => {
-      if (result.player1 === playerName) {
-        gamesWon += result.score1;
-      } else if (result.player2 === playerName) {
-        gamesWon += result.score2;
-      }
+      const isP1 = result.player1 === playerName;
+      const isP2 = result.player2 === playerName;
+      if (!isP1 && !isP2) return;
+
+      const add = (s1, s2) => {
+        if (s1 == null || s2 == null) return;
+        gamesWon += isP1 ? s1 : s2;
+      };
+
+      add(result.score1, result.score2);
+      add(result.set2Score1, result.set2Score2);
+      add(result.set3Score1, result.set3Score2);
     });
 
     return gamesWon;
   };
+
+  // Formatera fullständigt resultat för visning
+  const formatMatchScore = (result) => {
+    if (!result || result.status === 'WALKOVER') return null;
+    const sets = [];
+    const fmtSet = (s1, s2, tb1, tb2) => {
+      if (s1 == null || s2 == null) return null;
+      let str = `${s1}-${s2}`;
+      if (tb1 != null && tb2 != null) str += `(${tb1}-${tb2})`;
+      return str;
+    };
+    const s1 = fmtSet(result.score1, result.score2, result.tiebreak1Score1, result.tiebreak1Score2);
+    if (s1) sets.push(s1);
+    const s2 = fmtSet(result.set2Score1, result.set2Score2, result.tiebreak2Score1, result.tiebreak2Score2);
+    if (s2) sets.push(s2);
+    const s3 = fmtSet(result.set3Score1, result.set3Score2, result.tiebreak3Score1, result.tiebreak3Score2);
+    if (s3) sets.push(s3);
+    return sets;
+  };
+
+  const isMultiSetTournament = tournament?.setsPerMatch && tournament.setsPerMatch !== 'ett-set';
 
   // Sortera spelare efter poäng, setskillnad och vunna games
   const getSortedParticipants = (groupId, participants) => {
@@ -707,6 +741,12 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                             <span className="player">{result.player1}</span>
                             {result.status === 'WALKOVER' ? (
                               <span className="score-wo">W.O.</span>
+                            ) : isMultiSetTournament && formatMatchScore(result)?.length > 1 ? (
+                              <span className="multi-set-score">
+                                {formatMatchScore(result).map((s, i) => (
+                                  <span key={i} className="set-score-item">{s}</span>
+                                ))}
+                              </span>
                             ) : (
                               <>
                                 <span className="score">{result.score1 ?? '-'}</span>
@@ -819,15 +859,25 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                               >
                                 {match.player1}
                               </span>
-                              {result && <span className="player-score">{result.score1 ?? '-'}</span>}
+                              {result && (
+                                isMultiSetTournament && formatMatchScore(result)?.length > 1 ? (
+                                  <span className="multi-set-score playoff-multi-score">
+                                    {formatMatchScore(result).map((s, i) => (
+                                      <span key={i} className="set-score-item">{s}</span>
+                                    ))}
+                                  </span>
+                                ) : (
+                                  <span className="player-score">{result.score1 ?? '-'}</span>
+                                )
+                              )}
                             </div>
                             <div className="match-divider">
                               {result ? (
-                                result.status === 'WALKOVER' ? 'W.O.' : 'vs'
+                                result.status === 'WALKOVER' ? 'W.O.' : (isMultiSetTournament && formatMatchScore(result)?.length > 1 ? '' : 'vs')
                               ) : 'vs'}
                             </div>
                             <div className="player-side">
-                              {result && <span className="player-score">{result.score2 ?? '-'}</span>}
+                              {result && !isMultiSetTournament && <span className="player-score">{result.score2 ?? '-'}</span>}
                               <span 
                                 className="player-name"
                                 onDoubleClick={() => !result && !isReadOnly && handleRemovePlayerFromMatch(group.id, match.player2)}
@@ -913,6 +963,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
           onSubmit={handleReportSubmit}
           existingResult={selectedMatch.existingResult}
           gamesPerSet={tournament?.gamesPerSet ?? 4}
+          setsPerMatch={tournament?.setsPerMatch ?? 'ett-set'}
         />
       )}
     </div>

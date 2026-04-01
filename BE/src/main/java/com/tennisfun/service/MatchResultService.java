@@ -50,14 +50,33 @@ public class MatchResultService {
 
         int gamesPerSet = group.getTournament() != null && group.getTournament().getGamesPerSet() != null
                 ? group.getTournament().getGamesPerSet() : 4;
+        String setsPerMatch = group.getTournament() != null && group.getTournament().getSetsPerMatch() != null
+                ? group.getTournament().getSetsPerMatch() : "ett-set";
+        boolean isMultiSet = !"ett-set".equals(setsPerMatch);
 
         switch (status) {
             case PLAYED:
-                validatePlayed(request, gamesPerSet);
-                result.setScore1(request.getScore1());
-                result.setScore2(request.getScore2());
-                // Vinnaren bestäms av poängen
-                result.setWinner(request.getScore1() > request.getScore2() ? request.getPlayer1() : request.getPlayer2());
+                if (isMultiSet) {
+                    validateMultiSetPlayed(request);
+                    result.setScore1(request.getScore1());
+                    result.setScore2(request.getScore2());
+                    result.setSet2Score1(request.getSet2Score1());
+                    result.setSet2Score2(request.getSet2Score2());
+                    result.setSet3Score1(request.getSet3Score1());
+                    result.setSet3Score2(request.getSet3Score2());
+                    result.setTiebreak1Score1(request.getTiebreak1Score1());
+                    result.setTiebreak1Score2(request.getTiebreak1Score2());
+                    result.setTiebreak2Score1(request.getTiebreak2Score1());
+                    result.setTiebreak2Score2(request.getTiebreak2Score2());
+                    result.setTiebreak3Score1(request.getTiebreak3Score1());
+                    result.setTiebreak3Score2(request.getTiebreak3Score2());
+                    result.setWinner(request.getWinner());
+                } else {
+                    validatePlayed(request, gamesPerSet);
+                    result.setScore1(request.getScore1());
+                    result.setScore2(request.getScore2());
+                    result.setWinner(request.getScore1() > request.getScore2() ? request.getPlayer1() : request.getPlayer2());
+                }
                 break;
             case WALKOVER:
                 validateWinner(request);
@@ -66,10 +85,27 @@ public class MatchResultService {
                 result.setScore2(null);
                 break;
             case RETIRED:
-                validateRetired(request, gamesPerSet);
-                result.setWinner(request.getWinner());
-                result.setScore1(request.getScore1());
-                result.setScore2(request.getScore2());
+                if (isMultiSet) {
+                    validateWinner(request);
+                    result.setWinner(request.getWinner());
+                    result.setScore1(request.getScore1());
+                    result.setScore2(request.getScore2());
+                    result.setSet2Score1(request.getSet2Score1());
+                    result.setSet2Score2(request.getSet2Score2());
+                    result.setSet3Score1(request.getSet3Score1());
+                    result.setSet3Score2(request.getSet3Score2());
+                    result.setTiebreak1Score1(request.getTiebreak1Score1());
+                    result.setTiebreak1Score2(request.getTiebreak1Score2());
+                    result.setTiebreak2Score1(request.getTiebreak2Score1());
+                    result.setTiebreak2Score2(request.getTiebreak2Score2());
+                    result.setTiebreak3Score1(request.getTiebreak3Score1());
+                    result.setTiebreak3Score2(request.getTiebreak3Score2());
+                } else {
+                    validateRetired(request, gamesPerSet);
+                    result.setWinner(request.getWinner());
+                    result.setScore1(request.getScore1());
+                    result.setScore2(request.getScore2());
+                }
                 break;
         }
         
@@ -108,6 +144,44 @@ public class MatchResultService {
                 throw new IllegalArgumentException("Båda kan inte ha " + gamesPerSet + " games.");
             }
         }
+    }
+
+    private void validateMultiSetPlayed(ReportMatchRequest request) {
+        if (request.getScore1() == null || request.getScore2() == null) {
+            throw new IllegalArgumentException("Set 1 resultat måste anges.");
+        }
+        if (request.getSet2Score1() == null || request.getSet2Score2() == null) {
+            throw new IllegalArgumentException("Set 2 resultat måste anges.");
+        }
+        validateWinner(request);
+    }
+
+    private void copyMultiSetScores(MatchResult result, ReportMatchRequest request) {
+        result.setScore1(request.getScore1());
+        result.setScore2(request.getScore2());
+        result.setSet2Score1(request.getSet2Score1());
+        result.setSet2Score2(request.getSet2Score2());
+        result.setSet3Score1(request.getSet3Score1());
+        result.setSet3Score2(request.getSet3Score2());
+        result.setTiebreak1Score1(request.getTiebreak1Score1());
+        result.setTiebreak1Score2(request.getTiebreak1Score2());
+        result.setTiebreak2Score1(request.getTiebreak2Score1());
+        result.setTiebreak2Score2(request.getTiebreak2Score2());
+        result.setTiebreak3Score1(request.getTiebreak3Score1());
+        result.setTiebreak3Score2(request.getTiebreak3Score2());
+    }
+
+    private void clearMultiSetScores(MatchResult result) {
+        result.setSet2Score1(null);
+        result.setSet2Score2(null);
+        result.setSet3Score1(null);
+        result.setSet3Score2(null);
+        result.setTiebreak1Score1(null);
+        result.setTiebreak1Score2(null);
+        result.setTiebreak2Score1(null);
+        result.setTiebreak2Score2(null);
+        result.setTiebreak3Score1(null);
+        result.setTiebreak3Score2(null);
     }
 
     private void validateWinner(ReportMatchRequest request) {
@@ -153,28 +227,46 @@ public class MatchResultService {
                 .orElseThrow(() -> new IllegalArgumentException("Grupp hittades inte"));
         int gamesPerSet = existingGroup.getTournament() != null && existingGroup.getTournament().getGamesPerSet() != null
                 ? existingGroup.getTournament().getGamesPerSet() : 4;
+        String setsPerMatch = existingGroup.getTournament() != null && existingGroup.getTournament().getSetsPerMatch() != null
+                ? existingGroup.getTournament().getSetsPerMatch() : "ett-set";
+        boolean isMultiSet = !"ett-set".equals(setsPerMatch);
 
         MatchStatus status = MatchStatus.valueOf(request.getStatus().toUpperCase());
         existingResult.setStatus(status);
 
         switch (status) {
             case PLAYED:
-                validatePlayed(request, gamesPerSet);
-                existingResult.setScore1(request.getScore1());
-                existingResult.setScore2(request.getScore2());
-                existingResult.setWinner(request.getScore1() > request.getScore2() ? existingResult.getPlayer1() : existingResult.getPlayer2());
+                if (isMultiSet) {
+                    validateMultiSetPlayed(request);
+                    copyMultiSetScores(existingResult, request);
+                    existingResult.setWinner(request.getWinner());
+                } else {
+                    validatePlayed(request, gamesPerSet);
+                    existingResult.setScore1(request.getScore1());
+                    existingResult.setScore2(request.getScore2());
+                    existingResult.setWinner(request.getScore1() > request.getScore2() ? existingResult.getPlayer1() : existingResult.getPlayer2());
+                    clearMultiSetScores(existingResult);
+                }
                 break;
             case WALKOVER:
                 validateWinner(request);
                 existingResult.setWinner(request.getWinner());
                 existingResult.setScore1(null);
                 existingResult.setScore2(null);
+                clearMultiSetScores(existingResult);
                 break;
             case RETIRED:
-                validateRetired(request, gamesPerSet);
-                existingResult.setWinner(request.getWinner());
-                existingResult.setScore1(request.getScore1());
-                existingResult.setScore2(request.getScore2());
+                if (isMultiSet) {
+                    validateWinner(request);
+                    copyMultiSetScores(existingResult, request);
+                    existingResult.setWinner(request.getWinner());
+                } else {
+                    validateRetired(request, gamesPerSet);
+                    existingResult.setWinner(request.getWinner());
+                    existingResult.setScore1(request.getScore1());
+                    existingResult.setScore2(request.getScore2());
+                    clearMultiSetScores(existingResult);
+                }
                 break;
         }
         

@@ -220,6 +220,26 @@
   padding: 0 15px;
 }
 
+.multi-set-score {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.set-score-item {
+  color: #f27b4a;
+  font-weight: bold;
+  font-size: 0.95rem;
+  background: rgba(242, 123, 74, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.playoff-multi-score {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .edit-match-btn {
   background: #4a90e2;
   color: #fff;

@@ -42,6 +42,36 @@ public class MatchResult {
     
     @Column
     private Integer score2;
+
+    @Column
+    private Integer set2Score1;
+
+    @Column
+    private Integer set2Score2;
+
+    @Column
+    private Integer set3Score1;
+
+    @Column
+    private Integer set3Score2;
+
+    @Column
+    private Integer tiebreak1Score1;
+
+    @Column
+    private Integer tiebreak1Score2;
+
+    @Column
+    private Integer tiebreak2Score1;
+
+    @Column
+    private Integer tiebreak2Score2;
+
+    @Column
+    private Integer tiebreak3Score1;
+
+    @Column
+    private Integer tiebreak3Score2;
     
     @Column(nullable = false, updatable = false)
     private LocalDateTime reportedAt;

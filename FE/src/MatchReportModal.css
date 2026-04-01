@@ -247,3 +247,125 @@
   border-radius: 8px;
   margin-bottom: 30px;
 }
+
+/* Multi-set modal */
+.multi-set-modal {
+  max-width: 420px;
+}
+
+.multi-set-container {
+  margin-bottom: 25px;
+}
+
+.multi-set-players {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 12px;
+  padding: 0 10px;
+}
+
+.multi-set-player {
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-align: center;
+  flex: 1;
+}
+
+.set-section {
+  background: #0d1f28;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+}
+
+.set-title {
+  color: #f27b4a;
+  font-size: 0.95rem;
+  margin: 0 0 8px 0;
+  text-align: center;
+  font-weight: bold;
+}
+
+.set-scores {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.set-player-input input {
+  width: 60px;
+  background: #1a3a48;
+  border: 2px solid #f27b4a;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.set-player-input input:focus {
+  border-color: #ff8c5a;
+  box-shadow: 0 0 0 3px rgba(242, 123, 74, 0.3);
+}
+
+.set-player-input input::placeholder {
+  color: #555;
+}
+
+.set-divider {
+  color: #f27b4a;
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+.tiebreak-section {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(242, 123, 74, 0.2);
+}
+
+.tiebreak-label {
+  display: block;
+  color: #aaa;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.tiebreak-scores input {
+  width: 50px;
+  font-size: 1.1rem;
+  padding: 6px;
+}
+
+/* Hide number input spinners for cleaner look */
+.set-player-input input::-webkit-inner-spin-button,
+.set-player-input input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.set-player-input input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+@media (max-width: 600px) {
+  .multi-set-modal {
+    max-width: 95%;
+  }
+
+  .set-player-input input {
+    width: 50px;
+    font-size: 1.2rem;
+    padding: 6px;
+  }
+
+  .tiebreak-scores input {
+    width: 45px;
+  }
+}

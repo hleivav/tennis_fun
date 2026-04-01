@@ -32,6 +32,9 @@ public class Tournament {
 
     @Column
     private Integer gamesPerSet = 4;
+
+    @Column
+    private String setsPerMatch = "ett-set";
     
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
