@@ -753,7 +753,14 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                       >
                         {result ? (
                           <>
-                            <span className="player">{result.player1}</span>
+                            <span className="player">
+                              {result.player1}
+                              {result.status !== 'PLAYED' && result.winner !== result.player1 && (
+                                <span className={`match-status-tag ${result.status === 'WALKOVER' ? 'wo-tag' : 'ret-tag'}`}>
+                                  {result.status === 'WALKOVER' ? 'W.O.' : 'uppg.'}
+                                </span>
+                              )}
+                            </span>
                             {result.status === 'WALKOVER' ? (
                               <span className="score-wo">W.O.</span>
                             ) : isMultiSetTournament && formatMatchScore(result)?.length > 1 ? (
@@ -769,7 +776,14 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                                 <span className="score">{result.score2 ?? '-'}</span>
                               </>
                             )}
-                            <span className="player">{result.player2}</span>
+                            <span className="player">
+                              {result.player2}
+                              {result.status !== 'PLAYED' && result.winner !== result.player2 && (
+                                <span className={`match-status-tag ${result.status === 'WALKOVER' ? 'wo-tag' : 'ret-tag'}`}>
+                                  {result.status === 'WALKOVER' ? 'W.O.' : 'uppg.'}
+                                </span>
+                              )}
+                            </span>
                             {!isReadOnly && (
                               <button 
                                 className="edit-match-btn"
@@ -874,6 +888,11 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                               >
                                 {match.player1}
                               </span>
+                              {result && result.status !== 'PLAYED' && result.winner !== match.player1 && (
+                                <span className={`match-status-tag ${result.status === 'WALKOVER' ? 'wo-tag' : 'ret-tag'}`}>
+                                  {result.status === 'WALKOVER' ? 'W.O.' : 'uppg.'}
+                                </span>
+                              )}
                               {result && (
                                 isMultiSetTournament && formatMatchScore(result)?.length > 1 ? (
                                   <span className="multi-set-score playoff-multi-score">
@@ -901,6 +920,11 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                               >
                                 {match.player2}
                               </span>
+                              {result && result.status !== 'PLAYED' && result.winner !== match.player2 && (
+                                <span className={`match-status-tag ${result.status === 'WALKOVER' ? 'wo-tag' : 'ret-tag'}`}>
+                                  {result.status === 'WALKOVER' ? 'W.O.' : 'uppg.'}
+                                </span>
+                              )}
                             </div>
                             {!result && !isReadOnly && (
                               <button 

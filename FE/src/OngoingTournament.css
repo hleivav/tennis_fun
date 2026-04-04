@@ -220,6 +220,26 @@
   padding: 0 15px;
 }
 
+.match-status-tag {
+  font-size: 0.65rem;
+  font-weight: bold;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin-left: 6px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.wo-tag {
+  background: rgba(200, 200, 200, 0.15);
+  color: #aaa;
+}
+
+.ret-tag {
+  background: rgba(242, 123, 74, 0.15);
+  color: #f27b4a;
+}
+
 .multi-set-score {
   display: flex;
   gap: 8px;

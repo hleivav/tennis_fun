@@ -185,6 +185,17 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
           alert(`Set ${i + 1}: Ogiltigt resultat.`);
           return false;
         }
+        // If tiebreak sub-scores are filled in, they must agree with the set winner
+        if (needsTiebreak(i)) {
+          const tb1 = parseInt(s.tb1), tb2 = parseInt(s.tb2);
+          if (!isNaN(tb1) && !isNaN(tb2)) {
+            const tbWinnerIsP1 = tb1 > tb2;
+            if (tbWinnerIsP1 !== setWinner) {
+              alert(`Set ${i + 1}: Tiebreak-poängen stämmer inte överens med setresultatet. Vinnaren av tiebreaken måste vara samma spelare som vann setet.`);
+              return false;
+            }
+          }
+        }
       }
 
       // Validate set 3 if needed
@@ -213,6 +224,18 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
           if (setWinner === null) {
             alert('Set 3: Ogiltigt resultat.');
             return false;
+          }
+          // If tiebreak sub-scores are filled in, they must agree with the set winner
+          if (needsTiebreak(2)) {
+            const s3 = sets[2];
+            const tb1 = parseInt(s3.tb1), tb2 = parseInt(s3.tb2);
+            if (!isNaN(tb1) && !isNaN(tb2)) {
+              const tbWinnerIsP1 = tb1 > tb2;
+              if (tbWinnerIsP1 !== setWinner) {
+                alert('Set 3: Tiebreak-poängen stämmer inte överens med setresultatet. Vinnaren av tiebreaken måste vara samma spelare som vann setet.');
+                return false;
+              }
+            }
           }
         }
       }
