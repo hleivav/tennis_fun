@@ -51,22 +51,16 @@ export default function AdminForm() {
       reader.onload = (event) => {
         const arrayBuffer = event.target.result;
         
-        // Försök olika encodings för att hitta rätt för svenska tecken
+        // Detektera encoding: försök UTF-8 med strict-läge först,
+        // faller tillbaka på Windows-1252 för äldre Windows-textfiler
         let content = '';
         try {
-          // Försök först med Windows-1252 (vanligast för Windows-textfiler i Sverige)
-          const decoder = new TextDecoder('windows-1252');
+          const decoder = new TextDecoder('utf-8', { fatal: true });
           content = decoder.decode(arrayBuffer);
         } catch (error) {
-          // Om det misslyckas, försök UTF-8
-          try {
-            const decoder = new TextDecoder('utf-8');
-            content = decoder.decode(arrayBuffer);
-          } catch (e) {
-            // Sista försöket: ISO-8859-1
-            const decoder = new TextDecoder('iso-8859-1');
-            content = decoder.decode(arrayBuffer);
-          }
+          // Inte giltig UTF-8 – troligen Windows-1252 eller ISO-8859-1
+          const decoder = new TextDecoder('windows-1252');
+          content = decoder.decode(arrayBuffer);
         }
         
         // Rensa bort eventuella BOM-markeringar och andra problem

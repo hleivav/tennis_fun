@@ -185,10 +185,14 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
           alert(`Set ${i + 1}: Ogiltigt resultat.`);
           return false;
         }
-        // If tiebreak sub-scores are filled in, they must agree with the set winner
+        // If tiebreak sub-scores are filled in, validate them
         if (needsTiebreak(i)) {
           const tb1 = parseInt(s.tb1), tb2 = parseInt(s.tb2);
           if (!isNaN(tb1) && !isNaN(tb2)) {
+            if (Math.abs(tb1 - tb2) < 2) {
+              alert(`Set ${i + 1}: Tiebreak-vinnaren måste vinna med minst 2 poängs skillnad.`);
+              return false;
+            }
             const tbWinnerIsP1 = tb1 > tb2;
             if (tbWinnerIsP1 !== setWinner) {
               alert(`Set ${i + 1}: Tiebreak-poängen stämmer inte överens med setresultatet. Vinnaren av tiebreaken måste vara samma spelare som vann setet.`);
@@ -211,6 +215,10 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
             alert('Super tiebreak: En spelare måste nå 10 poäng.');
             return false;
           }
+          if (Math.abs(s1 - s2) < 2) {
+            alert('Super tiebreak: Vinnaren måste vinna med minst 2 poängs skillnad.');
+            return false;
+          }
         } else {
           const tied = gamesPerSet === 6 ? (s1 === 6 && s2 === 6) : (s1 === gamesPerSet - 1 && s2 === gamesPerSet - 1);
           if (tied) {
@@ -225,11 +233,15 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
             alert('Set 3: Ogiltigt resultat.');
             return false;
           }
-          // If tiebreak sub-scores are filled in, they must agree with the set winner
+          // If tiebreak sub-scores are filled in, validate them
           if (needsTiebreak(2)) {
             const s3 = sets[2];
             const tb1 = parseInt(s3.tb1), tb2 = parseInt(s3.tb2);
             if (!isNaN(tb1) && !isNaN(tb2)) {
+              if (Math.abs(tb1 - tb2) < 2) {
+                alert('Set 3: Tiebreak-vinnaren måste vinna med minst 2 poängs skillnad.');
+                return false;
+              }
               const tbWinnerIsP1 = tb1 > tb2;
               if (tbWinnerIsP1 !== setWinner) {
                 alert('Set 3: Tiebreak-poängen stämmer inte överens med setresultatet. Vinnaren av tiebreaken måste vara samma spelare som vann setet.');
