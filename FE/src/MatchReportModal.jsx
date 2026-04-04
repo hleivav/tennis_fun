@@ -90,8 +90,8 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
       const s1 = parseInt(s.score1), s2 = parseInt(s.score2);
       if (isNaN(s1) || isNaN(s2)) return null;
       if (isSuperTiebreakMode) {
-        if (s1 === 10 && s2 < 10) return match.player1;
-        if (s2 === 10 && s1 < 10) return match.player2;
+        if (s1 >= 10 && s1 > s2 && (s1 - s2) >= 2) return match.player1;
+        if (s2 >= 10 && s2 > s1 && (s2 - s1) >= 2) return match.player2;
         return null;
       } else {
         const result = didPlayer1WinSet(s1, s2);
