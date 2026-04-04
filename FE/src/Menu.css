@@ -71,7 +71,7 @@
   .main-menu ul {
     padding: 0 20px;
   }
-  .main-menu button, .menu-text {
+  .main-menu button:not(.hamburger), .menu-text {
     padding: 8px 10px;
     font-size: 0.95rem;
   }
@@ -127,7 +127,7 @@
     margin-left: 0 !important;
   }
 
-  .main-menu button, .menu-text {
+  .main-menu button:not(.hamburger), .menu-text {
     width: 100%;
     text-align: left;
     font-size: 1rem;
@@ -151,7 +151,7 @@
   opacity: 1;
   transform: scale(1.05);
 }
-.main-menu button {
+.main-menu button:not(.hamburger) {
   background: #f27b4a;
   color: #fff;
   border: none;
@@ -163,7 +163,7 @@
   transition: background 0.2s, color 0.2s;
   font-weight: bold;
 }
-.main-menu button:hover {
+.main-menu button:not(.hamburger):hover {
   background: #fff;
   color: #f27b4a;
 }

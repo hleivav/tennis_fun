@@ -44,7 +44,7 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
     return (s1 === gamesPerSet && s2 === gamesPerSet - 1) || (s1 === gamesPerSet - 1 && s2 === gamesPerSet);
   };
 
-  const getTiebreakMax = () => gamesPerSet === 6 ? 7 : gamesPerSet + 1;
+  const getTiebreakMin = () => gamesPerSet === 6 ? 7 : gamesPerSet + 1;
   const getMaxGames = () => gamesPerSet === 6 ? 7 : gamesPerSet;
 
   // Determine who won a set: true = player1, false = player2, null = invalid/undetermined
@@ -189,8 +189,15 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
         if (needsTiebreak(i)) {
           const tb1 = parseInt(s.tb1), tb2 = parseInt(s.tb2);
           if (!isNaN(tb1) && !isNaN(tb2)) {
-            if (Math.abs(tb1 - tb2) < 2) {
-              alert(`Set ${i + 1}: Tiebreak-vinnaren måste vinna med minst 2 poängs skillnad.`);
+            const tbMin = getTiebreakMin();
+            const tbMax = Math.max(tb1, tb2);
+            const tbDiff = Math.abs(tb1 - tb2);
+            if (tbMax < tbMin) {
+              alert(`Set ${i + 1}: Tiebreak-vinnaren måste ha minst ${tbMin} poäng.`);
+              return false;
+            }
+            if (tbDiff < 2) {
+              alert(`Set ${i + 1}: Tiebreak-vinnaren måste vinna med minst 2 poängs skillnad (t.ex. ${tbMin}-${tbMin - 2} eller ${tbMin + 1}-${tbMin - 1}).`);
               return false;
             }
             const tbWinnerIsP1 = tb1 > tb2;
@@ -211,12 +218,14 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
           return false;
         }
         if (isSuperTiebreakMode) {
-          if ((s1 !== 10 || s2 >= 10) && (s2 !== 10 || s1 >= 10)) {
-            alert('Super tiebreak: En spelare måste nå 10 poäng.');
+          const stMax = Math.max(s1, s2);
+          const stDiff = Math.abs(s1 - s2);
+          if (stMax < 10) {
+            alert('Super tiebreak: Vinnaren måste ha minst 10 poäng.');
             return false;
           }
-          if (Math.abs(s1 - s2) < 2) {
-            alert('Super tiebreak: Vinnaren måste vinna med minst 2 poängs skillnad.');
+          if (stDiff < 2) {
+            alert('Super tiebreak: Vinnaren måste vinna med minst 2 poängs skillnad (t.ex. 10-8, 11-9, 12-10...).');
             return false;
           }
         } else {
@@ -238,8 +247,15 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
             const s3 = sets[2];
             const tb1 = parseInt(s3.tb1), tb2 = parseInt(s3.tb2);
             if (!isNaN(tb1) && !isNaN(tb2)) {
-              if (Math.abs(tb1 - tb2) < 2) {
-                alert('Set 3: Tiebreak-vinnaren måste vinna med minst 2 poängs skillnad.');
+              const tbMin = getTiebreakMin();
+              const tbMax = Math.max(tb1, tb2);
+              const tbDiff = Math.abs(tb1 - tb2);
+              if (tbMax < tbMin) {
+                alert(`Set 3: Tiebreak-vinnaren måste ha minst ${tbMin} poäng.`);
+                return false;
+              }
+              if (tbDiff < 2) {
+                alert(`Set 3: Tiebreak-vinnaren måste vinna med minst 2 poängs skillnad (t.ex. ${tbMin}-${tbMin - 2} eller ${tbMin + 1}-${tbMin - 1}).`);
                 return false;
               }
               const tbWinnerIsP1 = tb1 > tb2;
@@ -367,7 +383,6 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
                 <input
                   type="number"
                   min="0"
-                  max={getTiebreakMax()}
                   value={s.tb1}
                   onChange={(e) => updateSet(setIndex, 'tb1', e.target.value)}
                   placeholder="0"
@@ -378,7 +393,6 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
                 <input
                   type="number"
                   min="0"
-                  max={getTiebreakMax()}
                   value={s.tb2}
                   onChange={(e) => updateSet(setIndex, 'tb2', e.target.value)}
                   placeholder="0"
@@ -401,7 +415,6 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
             <input
               type="number"
               min="0"
-              max="10"
               value={s.score1}
               onChange={(e) => updateSet(2, 'score1', e.target.value)}
               placeholder="0"
@@ -412,7 +425,6 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
             <input
               type="number"
               min="0"
-              max="10"
               value={s.score2}
               onChange={(e) => updateSet(2, 'score2', e.target.value)}
               placeholder="0"
