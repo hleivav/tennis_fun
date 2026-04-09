@@ -1,0 +1,317 @@
+/* ==========================================
+   SCREEN STYLES – overlay & controls
+   ========================================== */
+
+.print-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #f0f0f0;
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.print-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.print-btn {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.print-btn:hover {
+  background: #1d4ed8;
+}
+
+.close-print-btn {
+  background: #6b7280;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.close-print-btn:hover {
+  background: #4b5563;
+}
+
+/* ==========================================
+   DOCUMENT STYLES (screen + print)
+   ========================================== */
+
+.print-document {
+  background: #ffffff;
+  color: #111111;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+/* Header */
+.print-header {
+  text-align: center;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #111;
+}
+
+.print-header h1 {
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 4px 0;
+}
+
+.print-date {
+  font-size: 0.95rem;
+  color: #444;
+  margin: 0 0 6px 0;
+}
+
+.print-header h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Groups grid – 2 columns on screen, 2 on print */
+.print-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+/* Group card */
+.print-group-card {
+  border: 1.5px solid #222;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.print-group-header {
+  background: #111;
+  color: #fff;
+  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.print-group-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.print-courts {
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+/* Players section */
+.print-players-section {
+  padding: 10px 14px 6px;
+  border-bottom: 1px solid #ddd;
+}
+
+.print-players-section strong {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: #444;
+  letter-spacing: 0.03em;
+}
+
+.print-players-list {
+  margin: 4px 0 0 0;
+  padding-left: 18px;
+  font-size: 0.9rem;
+  color: #111;
+}
+
+.print-players-list li {
+  margin-bottom: 2px;
+}
+
+/* Matches section */
+.print-matches-section {
+  padding: 10px 14px 14px;
+}
+
+.print-matches-section strong {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  color: #444;
+  letter-spacing: 0.03em;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Matches table */
+.print-matches-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.print-match-row {
+  border-bottom: 1px dashed #ccc;
+}
+
+.print-match-row:last-child {
+  border-bottom: none;
+}
+
+.print-player-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #111;
+  padding: 6px 4px;
+  white-space: nowrap;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.print-score-cell {
+  padding: 6px 3px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.score-box {
+  display: inline-block;
+  width: 28px;
+  height: 22px;
+  border: 1.5px solid #555;
+  border-radius: 3px;
+  vertical-align: middle;
+  background: #fff;
+}
+
+.score-dash {
+  display: inline-block;
+  margin: 0 2px;
+  font-weight: 700;
+  color: #333;
+  vertical-align: middle;
+  font-size: 0.9rem;
+}
+
+.optional-set .score-box {
+  border-style: dashed;
+  border-color: #999;
+}
+
+.print-winner-cell {
+  padding: 6px 4px 6px 8px;
+  font-size: 0.78rem;
+  color: #555;
+  white-space: nowrap;
+}
+
+.winner-line {
+  display: inline-block;
+  width: 70px;
+  border-bottom: 1px solid #555;
+  vertical-align: bottom;
+  margin-left: 3px;
+}
+
+/* Footer */
+.print-footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.78rem;
+  color: #888;
+}
+
+/* ==========================================
+   PRINT MEDIA – override everything
+   ========================================== */
+
+@media print {
+  /* Hide all page UI */
+  body > * {
+    display: none !important;
+  }
+
+  /* Show only the overlay (which contains the document) */
+  .print-overlay {
+    display: block !important;
+    position: static !important;
+    background: #fff !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Hide controls */
+  .no-print {
+    display: none !important;
+  }
+
+  .print-document {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-width: 100% !important;
+    padding: 16px 20px !important;
+    margin: 0 !important;
+  }
+
+  .print-groups-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  .print-group-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Ensure black text on white */
+  * {
+    color: #000 !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-group-header {
+    background: #111 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-group-header * {
+    color: #fff !important;
+  }
+
+  .score-box {
+    border: 1.5px solid #555 !important;
+    background: #fff !important;
+  }
+}

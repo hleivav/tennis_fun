@@ -12,6 +12,25 @@
   border-bottom: 2px solid #f27b4a;
 }
 
+.print-schedule-btn {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 8px 20px;
+  background: transparent;
+  color: #f27b4a;
+  border: 1.5px solid #f27b4a;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.print-schedule-btn:hover {
+  background: #f27b4a;
+  color: #fff;
+}
+
 .tournament-header h1 {
   font-size: 2.5rem;
   color: #f27b4a;

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getAllTournaments, getTournamentById, reportMatch, updateMatch, deleteMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants } from './services/api';
 import MatchReportModal from './MatchReportModal';
+import PrintableGroupSchedule from './PrintableGroupSchedule';
 import './OngoingTournament.css';
 
 export default function OngoingTournament({ tournamentData = null, isReadOnly = false, isAdmin = false }) {
@@ -8,6 +9,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   const [loading, setLoading] = useState(!tournamentData);
   const [error, setError] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [showPrintSchedule, setShowPrintSchedule] = useState(false);
   const [matchResults, setMatchResults] = useState({}); // groupId -> array of results
   const [playoffSetup, setPlayoffSetup] = useState({}); // groupId -> { player1: null, player2: null, filled: false }
   const pollingIntervalRef = useRef(null);
@@ -691,6 +693,15 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     );
   }
 
+  if (showPrintSchedule) {
+    return (
+      <PrintableGroupSchedule
+        tournament={tournament}
+        onClose={() => setShowPrintSchedule(false)}
+      />
+    );
+  }
+
   return (
     <div className="ongoing-tournament-container">
       <div className="tournament-header">
@@ -700,6 +711,15 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
           month: 'long', 
           day: 'numeric' 
         })}</h3>
+        {getRoundRobinGroups().length > 0 && (
+          <button
+            className="print-schedule-btn"
+            onClick={() => setShowPrintSchedule(true)}
+            title="Skriv ut matchschema för gruppspel"
+          >
+            🖨️ Skriv ut matchschema
+          </button>
+        )}
       </div>
 
       {/* Round-robin groups (gruppspel) */}
