@@ -87,4 +87,9 @@ export const updateGroupParticipants = async (groupId, participants) => {
   return response.data;
 };
 
+export const renamePlayer = async (groupId, oldName, newName) => {
+  const response = await api.put(`/tournaments/groups/${groupId}/rename-player`, { oldName, newName });
+  return response.data;
+};
+
 export default api;

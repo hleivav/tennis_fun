@@ -261,6 +261,64 @@ public class TournamentService {
         
         return updatedGroup;
     }
+
+    @Transactional
+    public void renamePlayer(Long groupId, String oldName, String newName) {
+        log.info("Renaming player '{}' to '{}' in group ID: {}", oldName, newName, groupId);
+
+        if (oldName == null || oldName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Gammalt namn får inte vara tomt");
+        }
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Nytt namn får inte vara tomt");
+        }
+
+        String trimmedNew = newName.trim();
+
+        TournamentGroup group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new IllegalArgumentException("Grupp med ID " + groupId + " hittades inte"));
+
+        List<String> participants = group.getParticipants();
+        if (!participants.contains(oldName)) {
+            throw new IllegalArgumentException("Spelare '" + oldName + "' finns inte i gruppen");
+        }
+        if (participants.contains(trimmedNew) && !trimmedNew.equals(oldName)) {
+            throw new IllegalArgumentException("En spelare med namnet '" + trimmedNew + "' finns redan i gruppen");
+        }
+
+        // Update participants list
+        List<String> updatedParticipants = new ArrayList<>();
+        for (String p : participants) {
+            updatedParticipants.add(p.equals(oldName) ? trimmedNew : p);
+        }
+        group.setParticipants(updatedParticipants);
+        groupRepository.save(group);
+
+        // Update all match results in this group that reference the old name
+        List<MatchResult> results = matchResultRepository.findByGroupId(groupId);
+        for (MatchResult result : results) {
+            boolean changed = false;
+            if (oldName.equals(result.getPlayer1())) {
+                result.setPlayer1(trimmedNew);
+                changed = true;
+            }
+            if (oldName.equals(result.getPlayer2())) {
+                result.setPlayer2(trimmedNew);
+                changed = true;
+            }
+            if (oldName.equals(result.getWinner())) {
+                result.setWinner(trimmedNew);
+                changed = true;
+            }
+            if (changed) {
+                matchResultRepository.save(result);
+            }
+        }
+
+        log.info("Renamed player '{}' to '{}' in group {}, updated {} match results",
+                oldName, trimmedNew, groupId, results.stream().filter(r ->
+                    trimmedNew.equals(r.getPlayer1()) || trimmedNew.equals(r.getPlayer2())).count());
+    }
     
     // Hjälpklass för att hålla statistik för varje spelare
     private static class PlayerStats {

@@ -13,10 +13,49 @@ const generateMatches = (participants) => {
   return matches;
 };
 
+// Renders the score boxes for one player's side based on match format
+function PlayerScoreBoxes({ setsPerMatch }) {
+  if (!setsPerMatch || setsPerMatch === 'ett-set') {
+    // 1 set: game score box + tiebreak box
+    return (
+      <span className="player-boxes">
+        <span className="score-box"></span>
+        <span className="score-box score-box-tb" title="Tiebreak"></span>
+      </span>
+    );
+  }
+  if (setsPerMatch === 'forst-till-tva') {
+    // Best of 3 sets: box for each of the 3 possible sets
+    return (
+      <span className="player-boxes">
+        <span className="score-box"></span>
+        <span className="score-box"></span>
+        <span className="score-box score-box-optional"></span>
+      </span>
+    );
+  }
+  if (setsPerMatch === 'forst-till-tva-super') {
+    // 2 sets + super tiebreak
+    return (
+      <span className="player-boxes">
+        <span className="score-box"></span>
+        <span className="score-box"></span>
+        <span className="score-box score-box-super" title="Super tiebreak"></span>
+      </span>
+    );
+  }
+  // Fallback
+  return (
+    <span className="player-boxes">
+      <span className="score-box"></span>
+      <span className="score-box"></span>
+    </span>
+  );
+}
+
 export default function PrintableGroupSchedule({ tournament, onClose }) {
   const roundRobinGroups = tournament.groups.filter(g => g.participants.length > 2);
-  const isMultiSet = tournament?.setsPerMatch && tournament.setsPerMatch !== 'ett-set';
-  const isBestOfThree = tournament?.setsPerMatch === 'tre-set';
+  const setsPerMatch = tournament?.setsPerMatch || 'ett-set';
 
   const formattedDate = new Date(tournament.date).toLocaleDateString('sv-SE', {
     year: 'numeric',
@@ -74,44 +113,13 @@ export default function PrintableGroupSchedule({ tournament, onClose }) {
                       {matches.map((match, i) => (
                         <tr key={i} className="print-match-row">
                           <td className="print-player-name">{match.player1}</td>
-                          {isBestOfThree ? (
-                            <>
-                              <td className="print-score-cell">
-                                <span className="score-box"></span>
-                                <span className="score-dash">–</span>
-                                <span className="score-box"></span>
-                              </td>
-                              <td className="print-score-cell">
-                                <span className="score-box"></span>
-                                <span className="score-dash">–</span>
-                                <span className="score-box"></span>
-                              </td>
-                              <td className="print-score-cell optional-set">
-                                <span className="score-box"></span>
-                                <span className="score-dash">–</span>
-                                <span className="score-box"></span>
-                              </td>
-                            </>
-                          ) : isMultiSet ? (
-                            <>
-                              <td className="print-score-cell">
-                                <span className="score-box"></span>
-                                <span className="score-dash">–</span>
-                                <span className="score-box"></span>
-                              </td>
-                              <td className="print-score-cell">
-                                <span className="score-box"></span>
-                                <span className="score-dash">–</span>
-                                <span className="score-box"></span>
-                              </td>
-                            </>
-                          ) : (
-                            <td className="print-score-cell">
-                              <span className="score-box"></span>
-                              <span className="score-dash">–</span>
-                              <span className="score-box"></span>
-                            </td>
-                          )}
+                          <td className="print-scores-cell">
+                            <PlayerScoreBoxes setsPerMatch={setsPerMatch} />
+                          </td>
+                          <td className="print-vs-sep">–</td>
+                          <td className="print-scores-cell">
+                            <PlayerScoreBoxes setsPerMatch={setsPerMatch} />
+                          </td>
                           <td className="print-player-name">{match.player2}</td>
                           <td className="print-winner-cell">Vinnare: <span className="winner-line"></span></td>
                         </tr>

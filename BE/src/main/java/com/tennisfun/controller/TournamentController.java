@@ -152,8 +152,27 @@ public class TournamentController {
                     .body(new ErrorResponse("Ett fel uppstod vid uppdatering av deltagare"));
         }
     }
+
+    @PutMapping("/groups/{groupId}/rename-player")
+    public ResponseEntity<?> renamePlayer(
+            @PathVariable Long groupId,
+            @RequestBody RenamePlayerRequest request) {
+        try {
+            log.info("Renaming player in group ID: {}", groupId);
+            tournamentService.renamePlayer(groupId, request.oldName(), request.newName());
+            return ResponseEntity.ok(new SuccessResponse("Spelarnamn uppdaterat"));
+        } catch (IllegalArgumentException e) {
+            log.error("Validation error: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error renaming player", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Ett fel uppstod vid namnbyte"));
+        }
+    }
     
     // Inner classes för meddelanden
     record ErrorResponse(String message) {}
     record SuccessResponse(String message) {}
+    record RenamePlayerRequest(String oldName, String newName) {}
 }

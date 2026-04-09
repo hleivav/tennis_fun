@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getAllTournaments, getTournamentById, reportMatch, updateMatch, deleteMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants } from './services/api';
+import { getAllTournaments, getTournamentById, reportMatch, updateMatch, deleteMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants, renamePlayer } from './services/api';
 import MatchReportModal from './MatchReportModal';
 import PrintableGroupSchedule from './PrintableGroupSchedule';
 import './OngoingTournament.css';
@@ -10,6 +10,8 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   const [error, setError] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [showPrintSchedule, setShowPrintSchedule] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null); // { groupId, oldName }
+  const [editingName, setEditingName] = useState('');
   const [matchResults, setMatchResults] = useState({}); // groupId -> array of results
   const [playoffSetup, setPlayoffSetup] = useState({}); // groupId -> { player1: null, player2: null, filled: false }
   const pollingIntervalRef = useRef(null);
@@ -483,6 +485,41 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     return -1;
   };
 
+  const handleStartRenamePlayer = (groupId, playerName) => {
+    setEditingPlayer({ groupId, oldName: playerName });
+    setEditingName(playerName);
+  };
+
+  const handleCancelRenamePlayer = () => {
+    setEditingPlayer(null);
+    setEditingName('');
+  };
+
+  const handleSaveRenamePlayer = async () => {
+    if (!editingPlayer) return;
+    const trimmed = editingName.trim();
+    if (!trimmed) return;
+    if (trimmed === editingPlayer.oldName) {
+      handleCancelRenamePlayer();
+      return;
+    }
+    try {
+      await renamePlayer(editingPlayer.groupId, editingPlayer.oldName, trimmed);
+      const fullTournament = await getTournamentById(tournament.id);
+      setTournament(fullTournament);
+      await loadAllMatchResults(fullTournament.groups);
+      setEditingPlayer(null);
+      setEditingName('');
+    } catch (error) {
+      alert('Fel: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleRenameKeyDown = (e) => {
+    if (e.key === 'Enter') handleSaveRenamePlayer();
+    if (e.key === 'Escape') handleCancelRenamePlayer();
+  };
+
   // Hantera matchrapportering
   const handleMatchClick = (match, groupId) => {
     setSelectedMatch({ ...match, groupId });
@@ -743,11 +780,37 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                   {getSortedParticipants(group.id, group.participants).map((participant, index) => {
                     const points = calculatePoints(group.id, participant);
                     const setDiff = calculateSetDifference(group.id, participant);
+                    const isEditing = editingPlayer?.groupId === group.id && editingPlayer?.oldName === participant;
                     return (
                       <div key={index} className="participant-name">
                         <span className="player-info">
                           <span className="player-position">{index + 1}.</span>
-                          <span>{participant}</span>
+                          {isEditing ? (
+                            <span className="rename-inline">
+                              <input
+                                className="rename-input"
+                                value={editingName}
+                                onChange={(e) => setEditingName(e.target.value)}
+                                onKeyDown={handleRenameKeyDown}
+                                autoFocus
+                              />
+                              <button className="rename-save-btn" onClick={handleSaveRenamePlayer} title="Spara">✓</button>
+                              <button className="rename-cancel-btn" onClick={handleCancelRenamePlayer} title="Avbryt">×</button>
+                            </span>
+                          ) : (
+                            <>
+                              <span>{participant}</span>
+                              {!isReadOnly && isAdmin && (
+                                <button
+                                  className="rename-player-btn"
+                                  onClick={() => handleStartRenamePlayer(group.id, participant)}
+                                  title="Ändra namn"
+                                >
+                                  ✏️
+                                </button>
+                              )}
+                            </>
+                          )}
                         </span>
                         <span className="player-stats">
                           <span className="points">{points}p</span>
