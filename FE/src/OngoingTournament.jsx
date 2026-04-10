@@ -836,37 +836,39 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                       >
                         {result ? (
                           <>
-                            <span className="player">
-                              {result.player1}
-                              {result.status !== 'PLAYED' && result.winner !== result.player1 && (
-                                <span className={`match-status-tag ${result.status === 'WALKOVER' ? 'wo-tag' : 'ret-tag'}`}>
-                                  {result.status === 'WALKOVER' ? 'W.O.' : 'uppg.'}
-                                </span>
-                              )}
-                            </span>
-                            {result.status === 'WALKOVER' ? (
-                              <span className="score-wo">W.O.</span>
-                            ) : isMultiSetTournament && formatMatchScore(result)?.length > 1 ? (
-                              <span className="multi-set-score">
-                                {formatMatchScore(result).map((s, i) => (
-                                  <span key={i} className="set-score-item">{s}</span>
-                                ))}
+                            <div className="match-row-content">
+                              <span className="player">
+                                {result.player1}
+                                {result.status !== 'PLAYED' && result.winner !== result.player1 && (
+                                  <span className={`match-status-tag ${result.status === 'WALKOVER' ? 'wo-tag' : 'ret-tag'}`}>
+                                    {result.status === 'WALKOVER' ? 'W.O.' : 'uppg.'}
+                                  </span>
+                                )}
                               </span>
-                            ) : (
-                              <>
-                                <span className="score">{result.score1 ?? '-'}</span>
-                                <span className="vs">-</span>
-                                <span className="score">{result.score2 ?? '-'}</span>
-                              </>
-                            )}
-                            <span className="player">
-                              {result.player2}
-                              {result.status !== 'PLAYED' && result.winner !== result.player2 && (
-                                <span className={`match-status-tag ${result.status === 'WALKOVER' ? 'wo-tag' : 'ret-tag'}`}>
-                                  {result.status === 'WALKOVER' ? 'W.O.' : 'uppg.'}
+                              {result.status === 'WALKOVER' ? (
+                                <span className="score-wo">W.O.</span>
+                              ) : isMultiSetTournament && formatMatchScore(result)?.length > 1 ? (
+                                <span className="multi-set-score">
+                                  {formatMatchScore(result).map((s, i) => (
+                                    <span key={i} className="set-score-item">{s}</span>
+                                  ))}
                                 </span>
+                              ) : (
+                                <>
+                                  <span className="score">{result.score1 ?? '-'}</span>
+                                  <span className="vs">-</span>
+                                  <span className="score">{result.score2 ?? '-'}</span>
+                                </>
                               )}
-                            </span>
+                              <span className="player">
+                                {result.player2}
+                                {result.status !== 'PLAYED' && result.winner !== result.player2 && (
+                                  <span className={`match-status-tag ${result.status === 'WALKOVER' ? 'wo-tag' : 'ret-tag'}`}>
+                                    {result.status === 'WALKOVER' ? 'W.O.' : 'uppg.'}
+                                  </span>
+                                )}
+                              </span>
+                            </div>
                             {!isReadOnly && (
                               <button 
                                 className="edit-match-btn"
@@ -876,7 +878,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                                 }}
                                 title="Redigera resultat"
                               >
-                                ✏️
+                                ✏️ Redigera
                               </button>
                             )}
                           </>
@@ -1039,7 +1041,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
       })}
 
       <div className="total-ranking-section">
-        <h2 className="ranking-title">Total Ranking</h2>
+        <h2 className="ranking-title">Poängställning och placering</h2>
         {hasEmptyPlayoffSlots() && getActiveRoundIndex() === 0 && !isReadOnly && (() => {
           const firstPlayoffRound = getPlayoffRounds()[0];
           const firstRoundTitle = firstPlayoffRound ? getRoundTitle(firstPlayoffRound).toLowerCase() : 'första playoff-omgången';
