@@ -230,6 +230,47 @@
   cursor: help;
 }
 
+.legend-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 2px;
+  opacity: 0.7;
+  transition: opacity 0.2s, color 0.2s;
+  flex-shrink: 0;
+}
+
+.legend-toggle-btn:hover {
+  opacity: 1;
+  color: #f27b4a;
+}
+
+.column-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #0d2030;
+  border: 1px solid #f27b4a;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  line-height: 1.5;
+}
+
+.column-legend strong {
+  color: #f27b4a;
+}
+
+.column-legend--ranking {
+  max-width: 800px;
+  margin: 0 auto 10px;
+}
+
 .participant-name:first-child {
   background: linear-gradient(90deg, #0d1f28 0%, #1a3a28 100%);
   border-left: 3px solid #4ade80;

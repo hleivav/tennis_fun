@@ -14,6 +14,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   const [editingName, setEditingName] = useState('');
   const [editingTitle, setEditingTitle] = useState(false);
   const [editingTitleValue, setEditingTitleValue] = useState('');
+  const [showColumnLegend, setShowColumnLegend] = useState(false);
   const [matchResults, setMatchResults] = useState({}); // groupId -> array of results
   const [playoffSetup, setPlayoffSetup] = useState({}); // groupId -> { player1: null, player2: null, filled: false }
   const pollingIntervalRef = useRef(null);
@@ -875,8 +876,23 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                       <span className="header-stat" title="Poäng — 2 poäng per vunnen match">P</span>
                       <span className="header-stat" title="Setskillnad — set vunna minus set förlorade">SS</span>
                       <span className="header-stat" title="Gameskillnad — games vunna minus games förlorade">GS</span>
+                      <button
+                        className="legend-toggle-btn"
+                        onClick={() => setShowColumnLegend(v => !v)}
+                        aria-label="Visa förklaring av kolumner"
+                        title="Visa förklaring"
+                      >
+                        {showColumnLegend ? '✕' : 'ⓘ'}
+                      </button>
                     </span>
                   </div>
+                  {showColumnLegend && (
+                    <div className="column-legend">
+                      <span><strong>P</strong> = Poäng (2p per vunnen match)</span>
+                      <span><strong>SS</strong> = Setskillnad (set vunna − förlorade)</span>
+                      <span><strong>GS</strong> = Gameskillnad (games vunna − förlorade)</span>
+                    </div>
+                  )}
                   {getSortedParticipants(group.id, group.participants).map((participant, index) => {
                     const points = calculatePoints(group.id, participant);
                     const realSetDiff = calculateSetDifference(group.id, participant);
@@ -1158,8 +1174,23 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
             <span className="ranking-header-stat" title="Poäng — 2 poäng per vunnen match">P</span>
             <span className="ranking-header-stat" title="Setskillnad — set vunna minus set förlorade">SS</span>
             <span className="ranking-header-stat" title="Gameskillnad — games vunna minus games förlorade">GS</span>
+            <button
+              className="legend-toggle-btn"
+              onClick={() => setShowColumnLegend(v => !v)}
+              aria-label="Visa förklaring av kolumner"
+              title="Visa förklaring"
+            >
+              {showColumnLegend ? '✕' : 'ⓘ'}
+            </button>
           </span>
         </div>
+        {showColumnLegend && (
+          <div className="column-legend column-legend--ranking">
+            <span><strong>P</strong> = Poäng (2p per vunnen match)</span>
+            <span><strong>SS</strong> = Setskillnad (set vunna − förlorade)</span>
+            <span><strong>GS</strong> = Gameskillnad (games vunna − förlorade)</span>
+          </div>
+        )}
         <div className="ranking-list">
           {getTotalRanking().map((player, index) => {
             const totalPoints = calculateTotalPoints(player);
