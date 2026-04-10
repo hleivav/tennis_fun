@@ -79,6 +79,7 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
   };
 
   const isSuperTiebreakMode = setsPerMatch === 'forst-till-tva-super';
+  const isTb7Mode = setsPerMatch === 'forst-till-tva-tb7';
 
   // Determine overall match winner for multi-set
   const determineMultiSetWinner = () => {
@@ -92,6 +93,10 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
       if (isSuperTiebreakMode) {
         if (s1 >= 10 && s1 > s2 && (s1 - s2) >= 2) return match.player1;
         if (s2 >= 10 && s2 > s1 && (s2 - s1) >= 2) return match.player2;
+        return null;
+      } else if (isTb7Mode) {
+        if (s1 >= 7 && s1 > s2 && (s1 - s2) >= 2) return match.player1;
+        if (s2 >= 7 && s2 > s1 && (s2 - s1) >= 2) return match.player2;
         return null;
       } else {
         const result = didPlayer1WinSet(s1, s2);
@@ -214,7 +219,7 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
         const s = sets[2];
         const s1 = parseInt(s.score1), s2 = parseInt(s.score2);
         if (isNaN(s1) || isNaN(s2)) {
-          alert(isSuperTiebreakMode ? 'Super tiebreak: Resultat måste anges.' : 'Set 3: Båda spelarna måste ha ett resultat.');
+          alert(isSuperTiebreakMode ? 'Super tiebreak: Resultat måste anges.' : isTb7Mode ? 'Tie-break till 7: Resultat måste anges.' : 'Set 3: Båda spelarna måste ha ett resultat.');
           return false;
         }
         if (isSuperTiebreakMode) {
@@ -226,6 +231,17 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
           }
           if (stDiff < 2) {
             alert('Super tiebreak: Vinnaren måste vinna med minst 2 poängs skillnad (t.ex. 10-8, 11-9, 12-10...).');
+            return false;
+          }
+        } else if (isTb7Mode) {
+          const tbMax = Math.max(s1, s2);
+          const tbDiff = Math.abs(s1 - s2);
+          if (tbMax < 7) {
+            alert('Tie-break till 7: Vinnaren måste ha minst 7 poäng.');
+            return false;
+          }
+          if (tbDiff < 2) {
+            alert('Tie-break till 7: Vinnaren måste vinna med minst 2 poängs skillnad (t.ex. 7-5, 8-6, 9-7...).');
             return false;
           }
         } else {
@@ -435,6 +451,36 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
     );
   };
 
+  const renderTb7Inputs = () => {
+    const s = sets[2];
+    return (
+      <div className="set-section">
+        <h4 className="set-title">Tie-break till 7 (avgörande)</h4>
+        <div className="set-scores">
+          <div className="set-player-input">
+            <input
+              type="number"
+              min="0"
+              value={s.score1}
+              onChange={(e) => updateSet(2, 'score1', e.target.value)}
+              placeholder="0"
+            />
+          </div>
+          <span className="set-divider">-</span>
+          <div className="set-player-input">
+            <input
+              type="number"
+              min="0"
+              value={s.score2}
+              onChange={(e) => updateSet(2, 'score2', e.target.value)}
+              placeholder="0"
+            />
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const renderMultiSetScoreInputs = () => {
     if (status === 'WALKOVER') {
       return <div className="wo-message">Walkover - Ingen poäng rapporteras</div>;
@@ -453,7 +499,9 @@ export default function MatchReportModal({ match, groupId, onClose, onSubmit, on
         {showSet3 && (
           isSuperTiebreakMode
             ? renderSuperTiebreakInputs()
-            : renderSetInputs(2, 'Set 3')
+            : isTb7Mode
+              ? renderTb7Inputs()
+              : renderSetInputs(2, 'Set 3')
         )}
       </div>
     );

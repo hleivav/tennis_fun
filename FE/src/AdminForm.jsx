@@ -370,6 +370,7 @@ export default function AdminForm() {
                 <option value="ett-set">Ett set</option>
                 <option value="forst-till-tva">Först till två set</option>
                 <option value="forst-till-tva-super">Först till två set med super tiebreak</option>
+                <option value="forst-till-tva-tb7">Först till två set med tie-break till sju</option>
               </select>
             </div>
           </div>

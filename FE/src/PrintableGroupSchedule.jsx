@@ -44,6 +44,16 @@ function PlayerScoreBoxes({ setsPerMatch }) {
       </span>
     );
   }
+  if (setsPerMatch === 'forst-till-tva-tb7') {
+    // 2 sets + tiebreak to 7
+    return (
+      <span className="player-boxes">
+        <span className="score-box"></span>
+        <span className="score-box"></span>
+        <span className="score-box score-box-tb7" title="Tie-break till 7"></span>
+      </span>
+    );
+  }
   // Fallback
   return (
     <span className="player-boxes">

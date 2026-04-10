@@ -254,6 +254,13 @@
   border-color: #444;
 }
 
+/* Tie-break till 7 box: dashed, slightly wider than normal */
+.score-box-tb7 {
+  width: 26px;
+  border-style: dashed;
+  border-color: #444;
+}
+
 .score-dash {
   display: inline-block;
   margin: 0 2px;
