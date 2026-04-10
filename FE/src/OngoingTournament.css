@@ -197,6 +197,39 @@
   align-items: center;
 }
 
+.standings-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 15px 6px;
+  margin-bottom: 2px;
+}
+
+.header-player {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.header-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-stat {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 36px;
+  text-align: center;
+  cursor: help;
+}
+
 .participant-name:first-child {
   background: linear-gradient(90deg, #0d1f28 0%, #1a3a28 100%);
   border-left: 3px solid #4ade80;
@@ -288,6 +321,8 @@
   background: rgba(251, 191, 36, 0.1);
   padding: 2px 8px;
   border-radius: 4px;
+  min-width: 36px;
+  text-align: center;
 }
 
 .set-diff {
@@ -295,6 +330,8 @@
   font-weight: bold;
   padding: 2px 8px;
   border-radius: 4px;
+  min-width: 36px;
+  text-align: center;
 }
 
 .set-diff.positive {
@@ -312,6 +349,8 @@
   font-weight: bold;
   padding: 2px 8px;
   border-radius: 4px;
+  min-width: 36px;
+  text-align: center;
 }
 
 .set-diff-count.positive {
@@ -480,6 +519,51 @@
   padding-bottom: 15px;
 }
 
+.ranking-header-row {
+  max-width: 800px;
+  margin: 0 auto 4px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 4px 20px 6px;
+}
+
+.ranking-header-pos {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 40px;
+  text-align: center;
+}
+
+.ranking-header-player {
+  flex: 1;
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ranking-header-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ranking-header-stat {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 52px;
+  text-align: center;
+  cursor: help;
+}
+
 .ranking-list {
   max-width: 800px;
   margin: 0 auto;
@@ -568,6 +652,8 @@
   background: rgba(251, 191, 36, 0.15);
   padding: 4px 12px;
   border-radius: 6px;
+  min-width: 52px;
+  text-align: center;
 }
 
 .rank-1 .rank-points {
@@ -581,6 +667,8 @@
   font-weight: bold;
   padding: 4px 10px;
   border-radius: 6px;
+  min-width: 52px;
+  text-align: center;
 }
 
 .rank-set-diff.positive {
@@ -598,6 +686,8 @@
   font-weight: bold;
   padding: 4px 10px;
   border-radius: 6px;
+  min-width: 52px;
+  text-align: center;
 }
 
 .rank-set-diff-count.positive {

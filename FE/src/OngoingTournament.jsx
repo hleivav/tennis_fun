@@ -869,7 +869,14 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                 ) : null}
                 
                 <div className="participants-list">
-                  <h3>Spelare:</h3>
+                  <div className="standings-header-row">
+                    <span className="header-player">Spelare</span>
+                    <span className="header-stats">
+                      <span className="header-stat" title="Poäng — 2 poäng per vunnen match">P</span>
+                      <span className="header-stat" title="Setskillnad — set vunna minus set förlorade">SS</span>
+                      <span className="header-stat" title="Gameskillnad — games vunna minus games förlorade">GS</span>
+                    </span>
+                  </div>
                   {getSortedParticipants(group.id, group.participants).map((participant, index) => {
                     const points = calculatePoints(group.id, participant);
                     const realSetDiff = calculateSetDifference(group.id, participant);
@@ -907,12 +914,12 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                           )}
                         </span>
                         <span className="player-stats">
-                          <span className="points">{points}p</span>
+                          <span className="points">{points}</span>
                           <span className={`set-diff-count ${realSetDiff >= 0 ? 'positive' : 'negative'}`}>
-                            ({realSetDiff >= 0 ? '+' : ''}{realSetDiff} set)
+                            {realSetDiff >= 0 ? '+' : ''}{realSetDiff}
                           </span>
                           <span className={`set-diff ${gameDiff >= 0 ? 'positive' : 'negative'}`}>
-                            ({gameDiff >= 0 ? '+' : ''}{gameDiff})
+                            {gameDiff >= 0 ? '+' : ''}{gameDiff}
                           </span>
                         </span>
                       </div>
@@ -1144,6 +1151,15 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
           const firstRoundTitle = firstPlayoffRound ? getRoundTitle(firstPlayoffRound).toLowerCase() : 'första playoff-omgången';
           return <p className="playoff-instruction">Dubbelklicka på en spelare för att placera i {firstRoundTitle}</p>;
         })()}
+        <div className="ranking-header-row">
+          <span className="ranking-header-pos">#</span>
+          <span className="ranking-header-player">Spelare</span>
+          <span className="ranking-header-stats">
+            <span className="ranking-header-stat" title="Poäng — 2 poäng per vunnen match">P</span>
+            <span className="ranking-header-stat" title="Setskillnad — set vunna minus set förlorade">SS</span>
+            <span className="ranking-header-stat" title="Gameskillnad — games vunna minus games förlorade">GS</span>
+          </span>
+        </div>
         <div className="ranking-list">
           {getTotalRanking().map((player, index) => {
             const totalPoints = calculateTotalPoints(player);
@@ -1161,12 +1177,12 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                 <span className="rank-position">{index + 1}</span>
                 <span className="rank-player">{player}</span>
                 <span className="rank-stats">
-                  <span className="rank-points">{totalPoints}p</span>
+                  <span className="rank-points">{totalPoints}</span>
                   <span className={`rank-set-diff-count ${totalRealSetDiff >= 0 ? 'positive' : 'negative'}`}>
-                    ({totalRealSetDiff >= 0 ? '+' : ''}{totalRealSetDiff} set)
+                    {totalRealSetDiff >= 0 ? '+' : ''}{totalRealSetDiff}
                   </span>
                   <span className={`rank-set-diff ${totalGameDiff >= 0 ? 'positive' : 'negative'}`}>
-                    ({totalGameDiff >= 0 ? '+' : ''}{totalGameDiff})
+                    {totalGameDiff >= 0 ? '+' : ''}{totalGameDiff}
                   </span>
                 </span>
               </div>
