@@ -263,6 +263,16 @@ public class TournamentService {
     }
 
     @Transactional
+    public Tournament renameTournament(Long id, String newName) {
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Turneringsnamn f\u00e5r inte vara tomt");
+        }
+        Tournament tournament = getTournamentById(id);
+        tournament.setName(newName.trim());
+        return tournamentRepository.save(tournament);
+    }
+
+    @Transactional
     public void renamePlayer(Long groupId, String oldName, String newName) {
         log.info("Renaming player '{}' to '{}' in group ID: {}", oldName, newName, groupId);
 

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getAllTournaments, getTournamentById, reportMatch, updateMatch, deleteMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants, renamePlayer } from './services/api';
+import { getAllTournaments, getTournamentById, reportMatch, updateMatch, deleteMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants, renamePlayer, renameTournament } from './services/api';
 import MatchReportModal from './MatchReportModal';
 import PrintableGroupSchedule from './PrintableGroupSchedule';
 import './OngoingTournament.css';
@@ -12,6 +12,8 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   const [showPrintSchedule, setShowPrintSchedule] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null); // { groupId, oldName }
   const [editingName, setEditingName] = useState('');
+  const [editingTitle, setEditingTitle] = useState(false);
+  const [editingTitleValue, setEditingTitleValue] = useState('');
   const [matchResults, setMatchResults] = useState({}); // groupId -> array of results
   const [playoffSetup, setPlayoffSetup] = useState({}); // groupId -> { player1: null, player2: null, filled: false }
   const pollingIntervalRef = useRef(null);
@@ -187,7 +189,10 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   };
 
   // Beräkna setskillnad för en spelare i en grupp (summerar games över alla set)
-  const calculateSetDifference = (groupId, playerName) => {
+  // set3 är tie-break (tb7/super) och ska inte räknas i gameskillnad
+  const isTbThirdSet = tournament?.setsPerMatch === 'forst-till-tva-tb7' || tournament?.setsPerMatch === 'forst-till-tva-super';
+
+  const calculateGameDifference = (groupId, playerName) => {
     const results = matchResults[groupId] || [];
     let gamesWon = 0;
     let gamesLost = 0;
@@ -205,13 +210,41 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
 
       addGames(result.score1, result.score2);
       addGames(result.set2Score1, result.set2Score2);
-      addGames(result.set3Score1, result.set3Score2);
+      if (!isTbThirdSet) addGames(result.set3Score1, result.set3Score2);
     });
 
     return gamesWon - gamesLost;
   };
 
-  // Beräkna totalt antal vunna games för en spelare (över alla set)
+  // Beräkna setskillnad (set vunna minus set förlorade, tie-break räknas som ett set)
+  const calculateSetDifference = (groupId, playerName) => {
+    const results = matchResults[groupId] || [];
+    let setsWon = 0;
+    let setsLost = 0;
+
+    results.forEach(result => {
+      const isP1 = result.player1 === playerName;
+      const isP2 = result.player2 === playerName;
+      if (!isP1 && !isP2) return;
+      if (result.status === 'WALKOVER') return;
+
+      const countSet = (s1, s2) => {
+        if (s1 == null || s2 == null) return;
+        const my = isP1 ? s1 : s2;
+        const opp = isP1 ? s2 : s1;
+        if (my > opp) setsWon++;
+        else if (my < opp) setsLost++;
+      };
+
+      countSet(result.score1, result.score2);
+      countSet(result.set2Score1, result.set2Score2);
+      countSet(result.set3Score1, result.set3Score2);
+    });
+
+    return setsWon - setsLost;
+  };
+
+  // Beräkna totalt antal vunna games för en spelare (över alla set, exkl. tb3)
   const calculateGamesWon = (groupId, playerName) => {
     const results = matchResults[groupId] || [];
     let gamesWon = 0;
@@ -228,7 +261,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
 
       add(result.score1, result.score2);
       add(result.set2Score1, result.set2Score2);
-      add(result.set3Score1, result.set3Score2);
+      if (!isTbThirdSet) add(result.set3Score1, result.set3Score2);
     });
 
     return gamesWon;
@@ -255,28 +288,25 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
 
   const isMultiSetTournament = tournament?.setsPerMatch && tournament.setsPerMatch !== 'ett-set';
 
-  // Sortera spelare efter poäng, setskillnad och vunna games
+  // Sortera spelare efter poäng, setskillnad, gameskillnad och vunna games
   const getSortedParticipants = (groupId, participants) => {
     return [...participants].sort((a, b) => {
       const pointsA = calculatePoints(groupId, a);
       const pointsB = calculatePoints(groupId, b);
-      
-      // Sortera efter poäng först
-      if (pointsA !== pointsB) {
-        return pointsB - pointsA; // Högst poäng först
-      }
-      
-      // Om lika poäng, använd setskillnad
+
+      if (pointsA !== pointsB) return pointsB - pointsA;
+
       const setDiffA = calculateSetDifference(groupId, a);
       const setDiffB = calculateSetDifference(groupId, b);
-      if (setDiffA !== setDiffB) {
-        return setDiffB - setDiffA; // Högst setskillnad först
-      }
+      if (setDiffA !== setDiffB) return setDiffB - setDiffA;
 
-      // Om lika setskillnad, använd totalt antal vunna games
+      const gameDiffA = calculateGameDifference(groupId, a);
+      const gameDiffB = calculateGameDifference(groupId, b);
+      if (gameDiffA !== gameDiffB) return gameDiffB - gameDiffA;
+
       const gamesWonA = calculateGamesWon(groupId, a);
       const gamesWonB = calculateGamesWon(groupId, b);
-      return gamesWonB - gamesWonA; // Flest vunna games först
+      return gamesWonB - gamesWonA;
     });
   };
 
@@ -291,15 +321,26 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     return totalPoints;
   };
 
-  // Beräkna total setskillnad för en spelare över alla grupper
+  // Beräkna total setskillnad (set vunna minus förlorade) för en spelare över alla grupper
   const calculateTotalSetDifference = (playerName) => {
-    let totalSetDiff = 0;
+    let total = 0;
     tournament.groups.forEach(group => {
       if (group.participants.includes(playerName)) {
-        totalSetDiff += calculateSetDifference(group.id, playerName);
+        total += calculateSetDifference(group.id, playerName);
       }
     });
-    return totalSetDiff;
+    return total;
+  };
+
+  // Beräkna total gameskillnad för en spelare över alla grupper
+  const calculateTotalGameDifference = (playerName) => {
+    let total = 0;
+    tournament.groups.forEach(group => {
+      if (group.participants.includes(playerName)) {
+        total += calculateGameDifference(group.id, playerName);
+      }
+    });
+    return total;
   };
 
   // Beräkna totalt antal vunna games för en spelare över alla grupper
@@ -337,9 +378,11 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
       
       const setDiffA = calculateTotalSetDifference(a);
       const setDiffB = calculateTotalSetDifference(b);
-      if (setDiffA !== setDiffB) {
-        return setDiffB - setDiffA;
-      }
+      if (setDiffA !== setDiffB) return setDiffB - setDiffA;
+
+      const gameDiffA = calculateTotalGameDifference(a);
+      const gameDiffB = calculateTotalGameDifference(b);
+      if (gameDiffA !== gameDiffB) return gameDiffB - gameDiffA;
 
       const gamesWonA = calculateTotalGamesWon(a);
       const gamesWonB = calculateTotalGamesWon(b);
@@ -483,6 +526,37 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
       if (hasEmptySlots) return i;
     }
     return -1;
+  };
+
+  const handleStartEditTitle = () => {
+    setEditingTitleValue(tournament.name);
+    setEditingTitle(true);
+  };
+
+  const handleCancelEditTitle = () => {
+    setEditingTitle(false);
+    setEditingTitleValue('');
+  };
+
+  const handleSaveTitle = async () => {
+    const trimmed = editingTitleValue.trim();
+    if (!trimmed || trimmed === tournament.name) {
+      handleCancelEditTitle();
+      return;
+    }
+    try {
+      const updated = await renameTournament(tournament.id, trimmed);
+      setTournament(prev => ({ ...prev, name: updated.name }));
+      setEditingTitle(false);
+      setEditingTitleValue('');
+    } catch (error) {
+      alert('Fel: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleTitleKeyDown = (e) => {
+    if (e.key === 'Enter') handleSaveTitle();
+    if (e.key === 'Escape') handleCancelEditTitle();
   };
 
   const handleStartRenamePlayer = (groupId, playerName) => {
@@ -742,7 +816,26 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   return (
     <div className="ongoing-tournament-container">
       <div className="tournament-header">
-        <h1>{tournament.name}</h1>
+        {editingTitle ? (
+          <div className="title-edit-row">
+            <input
+              className="title-edit-input"
+              value={editingTitleValue}
+              onChange={(e) => setEditingTitleValue(e.target.value)}
+              onKeyDown={handleTitleKeyDown}
+              autoFocus
+            />
+            <button className="title-save-btn" onClick={handleSaveTitle} title="Spara">✓</button>
+            <button className="title-cancel-btn" onClick={handleCancelEditTitle} title="Avbryt">×</button>
+          </div>
+        ) : (
+          <div className="title-display-row">
+            <h1>{tournament.name}</h1>
+            {!isReadOnly && isAdmin && (
+              <button className="title-edit-btn" onClick={handleStartEditTitle} title="Redigera namn">✏️</button>
+            )}
+          </div>
+        )}
         <h3>{new Date(tournament.date).toLocaleDateString('sv-SE', { 
           year: 'numeric', 
           month: 'long', 
@@ -779,7 +872,8 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                   <h3>Spelare:</h3>
                   {getSortedParticipants(group.id, group.participants).map((participant, index) => {
                     const points = calculatePoints(group.id, participant);
-                    const setDiff = calculateSetDifference(group.id, participant);
+                    const realSetDiff = calculateSetDifference(group.id, participant);
+                    const gameDiff = calculateGameDifference(group.id, participant);
                     const isEditing = editingPlayer?.groupId === group.id && editingPlayer?.oldName === participant;
                     return (
                       <div key={index} className="participant-name">
@@ -814,8 +908,11 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                         </span>
                         <span className="player-stats">
                           <span className="points">{points}p</span>
-                          <span className={`set-diff ${setDiff >= 0 ? 'positive' : 'negative'}`}>
-                            ({setDiff >= 0 ? '+' : ''}{setDiff})
+                          <span className={`set-diff-count ${realSetDiff >= 0 ? 'positive' : 'negative'}`}>
+                            ({realSetDiff >= 0 ? '+' : ''}{realSetDiff} set)
+                          </span>
+                          <span className={`set-diff ${gameDiff >= 0 ? 'positive' : 'negative'}`}>
+                            ({gameDiff >= 0 ? '+' : ''}{gameDiff})
                           </span>
                         </span>
                       </div>
@@ -1050,7 +1147,8 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
         <div className="ranking-list">
           {getTotalRanking().map((player, index) => {
             const totalPoints = calculateTotalPoints(player);
-            const totalSetDiff = calculateTotalSetDifference(player);
+            const totalRealSetDiff = calculateTotalSetDifference(player);
+            const totalGameDiff = calculateTotalGameDifference(player);
             const isPlaced = Object.values(playoffSetup).some(s => s.player1 === player || s.player2 === player);
             const canSelect = hasEmptyPlayoffSlots() && getActiveRoundIndex() === 0 && !isReadOnly && !isPlaced;
             return (
@@ -1064,8 +1162,11 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
                 <span className="rank-player">{player}</span>
                 <span className="rank-stats">
                   <span className="rank-points">{totalPoints}p</span>
-                  <span className={`rank-set-diff ${totalSetDiff >= 0 ? 'positive' : 'negative'}`}>
-                    ({totalSetDiff >= 0 ? '+' : ''}{totalSetDiff})
+                  <span className={`rank-set-diff-count ${totalRealSetDiff >= 0 ? 'positive' : 'negative'}`}>
+                    ({totalRealSetDiff >= 0 ? '+' : ''}{totalRealSetDiff} set)
+                  </span>
+                  <span className={`rank-set-diff ${totalGameDiff >= 0 ? 'positive' : 'negative'}`}>
+                    ({totalGameDiff >= 0 ? '+' : ''}{totalGameDiff})
                   </span>
                 </span>
               </div>

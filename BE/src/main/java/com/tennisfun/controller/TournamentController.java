@@ -70,6 +70,24 @@ public class TournamentController {
         }
     }
     
+    @PutMapping("/{id}/rename")
+    public ResponseEntity<?> renameTournament(
+            @PathVariable Long id,
+            @RequestBody RenameTournamentRequest request) {
+        try {
+            log.info("Renaming tournament ID: {} to '{}'", id, request.newName());
+            Tournament tournament = tournamentService.renameTournament(id, request.newName());
+            return ResponseEntity.ok(tournament);
+        } catch (IllegalArgumentException e) {
+            log.error("Validation error: {}", e.getMessage());
+            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Error renaming tournament", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Ett fel uppstod vid namnbyte av turnering"));
+        }
+    }
+
     @PutMapping("/{id}/archive")
     public ResponseEntity<?> archiveTournament(@PathVariable Long id) {
         try {
@@ -175,4 +193,5 @@ public class TournamentController {
     record ErrorResponse(String message) {}
     record SuccessResponse(String message) {}
     record RenamePlayerRequest(String oldName, String newName) {}
+    record RenameTournamentRequest(String newName) {}
 }
