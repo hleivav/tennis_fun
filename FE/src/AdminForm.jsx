@@ -141,9 +141,9 @@ export default function AdminForm() {
 
     const targetGroup = groups[targetGroupIndex];
     
-    // Kolla om gruppen redan har 5 namn
-    if (targetGroup.length >= 5) {
-      alert('Denna grupp är full (max 5 deltagare)');
+    // Kolla om gruppen redan har 6 namn
+    if (targetGroup.length >= 6) {
+      alert('Denna grupp är full (max 6 deltagare)');
       return;
     }
 
