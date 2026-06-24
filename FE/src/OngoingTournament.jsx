@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getAllTournaments, getTournamentById, reportMatch, updateMatch, deleteMatch, getMatchResultsForGroup, getActiveTournaments, createNextRound, updateGroupParticipants, renamePlayer, renameTournament } from './services/api';
 import MatchReportModal from './MatchReportModal';
 import PrintableGroupSchedule from './PrintableGroupSchedule';
+import PrintableTournamentResults from './PrintableTournamentResults';
 import './OngoingTournament.css';
 
 export default function OngoingTournament({ tournamentData = null, isReadOnly = false, isAdmin = false }) {
@@ -10,6 +11,7 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
   const [error, setError] = useState(null);
   const [selectedMatch, setSelectedMatch] = useState(null);
   const [showPrintSchedule, setShowPrintSchedule] = useState(false);
+  const [showPrintTournament, setShowPrintTournament] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null); // { groupId, oldName }
   const [editingName, setEditingName] = useState('');
   const [editingTitle, setEditingTitle] = useState(false);
@@ -400,6 +402,19 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
         getResultForMatch(group.id, match.player1, match.player2) !== undefined
       );
     });
+  };
+
+  // Kolla om finalen är klar (resultatet i den sista omgången med 1 match är rapporterat)
+  const isFinalComplete = () => {
+    const rounds = getPlayoffRounds();
+    if (rounds.length === 0) return false;
+    const finalRound = rounds[rounds.length - 1];
+    if (finalRound.length !== 1) return false;
+    const finalGroup = finalRound[0];
+    if (finalGroup.participants.length < 2) return false;
+    const match = generateMatches(finalGroup.participants)[0];
+    if (!match) return false;
+    return getResultForMatch(finalGroup.id, match.player1, match.player2) !== undefined;
   };
 
   // Kolla om det finns tomma playoff-slots att fylla
@@ -814,6 +829,16 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
     );
   }
 
+  if (showPrintTournament) {
+    return (
+      <PrintableTournamentResults
+        tournament={tournament}
+        matchResults={matchResults}
+        onClose={() => setShowPrintTournament(false)}
+      />
+    );
+  }
+
   return (
     <div className="ongoing-tournament-container">
       <div className="tournament-header">
@@ -849,6 +874,15 @@ export default function OngoingTournament({ tournamentData = null, isReadOnly = 
             title="Skriv ut matchschema för gruppspel"
           >
             🖨️ Skriv ut matchschema
+          </button>
+        )}
+        {isFinalComplete() && (
+          <button
+            className="print-tournament-btn"
+            onClick={() => setShowPrintTournament(true)}
+            title="Skriv ut hela tävlingens resultat"
+          >
+            🏆 Skriv ut tävlingsresultat
           </button>
         )}
       </div>

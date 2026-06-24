@@ -1,0 +1,313 @@
+/* ==========================================
+   WINNER SECTION
+   ========================================== */
+
+.tr-winner-section {
+  text-align: center;
+  margin: 24px 0 32px;
+  padding: 20px;
+  background: #fffbe6;
+  border: 2px solid #f59e0b;
+  border-radius: 10px;
+}
+
+.tr-trophy {
+  font-size: 2.8rem;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.tr-winner-name {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #111;
+  letter-spacing: 0.02em;
+}
+
+.tr-winner-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #b45309;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 4px;
+}
+
+/* ==========================================
+   SECTIONS
+   ========================================== */
+
+.tr-section {
+  margin-bottom: 28px;
+}
+
+.tr-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #111;
+  border-bottom: 2px solid #111;
+  padding-bottom: 6px;
+  margin: 0 0 16px 0;
+}
+
+/* ==========================================
+   GROUP STAGE
+   ========================================== */
+
+.tr-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.tr-group-card {
+  border: 1.5px solid #222;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.tr-group-header {
+  background: #111;
+  color: #fff;
+  padding: 7px 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.tr-standings-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.tr-standings-table th {
+  background: #f3f4f6;
+  padding: 5px 8px;
+  text-align: left;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.tr-th-pos,
+.tr-th-stat {
+  text-align: center;
+  width: 32px;
+}
+
+.tr-th-name {
+  text-align: left;
+}
+
+.tr-standings-table td {
+  padding: 5px 8px;
+  border-top: 1px solid #e5e7eb;
+  color: #111;
+}
+
+.tr-td-pos,
+.tr-td-stat {
+  text-align: center;
+  color: #444;
+  font-variant-numeric: tabular-nums;
+}
+
+.tr-td-name {
+  font-weight: 600;
+}
+
+.tr-first-place td {
+  background: #f0fdf4;
+}
+
+.tr-first-place .tr-td-name {
+  color: #166534;
+}
+
+.tr-group-matches {
+  padding: 8px 12px 12px;
+  border-top: 1px solid #e5e7eb;
+  background: #fafafa;
+}
+
+.tr-matches-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #666;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.tr-match-result-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.83rem;
+  margin-bottom: 3px;
+}
+
+.tr-match-winner {
+  font-weight: 700;
+  color: #111;
+  flex: 1;
+}
+
+.tr-match-loser {
+  color: #777;
+  flex: 1;
+}
+
+.tr-match-score {
+  font-variant-numeric: tabular-nums;
+  color: #333;
+  font-weight: 600;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   PLAYOFF ROUNDS
+   ========================================== */
+
+.tr-round {
+  margin-bottom: 20px;
+}
+
+.tr-round-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #333;
+  margin: 0 0 10px 0;
+}
+
+.tr-playoff-matches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tr-playoff-card {
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  padding: 10px 16px;
+  background: #fff;
+  min-width: 220px;
+  flex: 1;
+  max-width: 320px;
+}
+
+.tr-final-card {
+  border-color: #f59e0b;
+  border-width: 2px;
+  background: #fffdf0;
+}
+
+.tr-final-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #b45309;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.tr-match-label {
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.tr-playoff-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tr-playoff-player {
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.tr-playoff-winner {
+  font-weight: 800;
+  color: #111;
+}
+
+.tr-playoff-loser {
+  color: #888;
+  font-weight: 400;
+}
+
+.tr-playoff-vs {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #444;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.tr-win-check {
+  color: #16a34a;
+}
+
+/* ==========================================
+   PRINT MEDIA
+   ========================================== */
+
+@media print {
+  .tr-winner-section {
+    background: #fffbe6 !important;
+    border-color: #f59e0b !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .tr-group-header {
+    background: #111 !important;
+    color: #fff !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .tr-group-header * {
+    color: #fff !important;
+  }
+
+  .tr-first-place td {
+    background: #f0fdf4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .tr-final-card {
+    border-color: #f59e0b !important;
+    background: #fffdf0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .tr-groups-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .tr-group-card,
+  .tr-playoff-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .tr-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
