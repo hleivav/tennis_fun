@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import './PrintableTournamentResults.css';
 
 const generateMatches = (participants) => {
@@ -162,7 +163,7 @@ export default function PrintableTournamentResults({ tournament, matchResults, o
   const playoffRounds = getPlayoffRounds();
   const winner = getFinalWinner();
 
-  return (
+  return createPortal(
     <div className="print-overlay">
       <div className="print-controls no-print">
         <button className="print-btn" onClick={handlePrint}>
@@ -314,6 +315,7 @@ export default function PrintableTournamentResults({ tournament, matchResults, o
 
         <div className="print-footer no-print">Tennis Fun – Tävlingsresultat</div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

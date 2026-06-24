@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import './PrintableGroupSchedule.css';
 
 const generateMatches = (participants) => {
@@ -75,7 +76,7 @@ export default function PrintableGroupSchedule({ tournament, onClose }) {
 
   const handlePrint = () => window.print();
 
-  return (
+  return createPortal(
     <div className="print-overlay">
       <div className="print-controls no-print">
         <button className="print-btn" onClick={handlePrint}>
@@ -146,6 +147,7 @@ export default function PrintableGroupSchedule({ tournament, onClose }) {
           Tennis Fun – Matchschema
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
